@@ -1,7 +1,7 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
+import 'package:tetrabit_toko_pos/components/loading_cilcular.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:diatera_pos/components/user_card.dart';
+import 'package:tetrabit_toko_pos/components/user_card.dart';
 
 import '../../../constructors/text_field_default.dart';
 import '../../../constructors/text_style.dart';

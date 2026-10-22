@@ -1,7 +1,7 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/components/loading_cilcular.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

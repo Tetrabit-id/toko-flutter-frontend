@@ -1,4 +1,4 @@
-import 'package:diatera_pos/components/edit_rekap_kas_popup.dart';
+import 'package:tetrabit_toko_pos/components/edit_rekap_kas_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

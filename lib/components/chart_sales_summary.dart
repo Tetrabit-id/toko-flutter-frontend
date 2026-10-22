@@ -76,7 +76,7 @@ class _ChartSummaryState extends State<ChartSummary> {
                                         showTitles: true,
                                         getTitlesWidget: (value, meta) {
                                           return SideTitleWidget(
-                                            axisSide: meta.axisSide,
+                                            meta: meta,
                                             child: Text(
                                               titles[value.toInt()],
                                               style: const TextStyle(
@@ -95,7 +95,7 @@ class _ChartSummaryState extends State<ChartSummary> {
                               barTouchData: BarTouchData(
                                 enabled: true,
                                 touchTooltipData: BarTouchTooltipData(
-                                  tooltipBgColor: Colors.black87,
+                                  getTooltipColor: (_) => Colors.black87,
                                   getTooltipItem:
                                       (group, groupIndex, rod, rodIndex) =>
                                           BarTooltipItem(

@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:diatera_pos/components/add_kategori_produk_popup.dart';
-import 'package:diatera_pos/constructors/button_primary.dart';
-import 'package:diatera_pos/constructors/text_field_rounded.dart';
-import 'package:diatera_pos/models/kategori.dart';
-import 'package:diatera_pos/models/merk.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/components/add_kategori_produk_popup.dart';
+import 'package:tetrabit_toko_pos/constructors/button_primary.dart';
+import 'package:tetrabit_toko_pos/constructors/text_field_rounded.dart';
+import 'package:tetrabit_toko_pos/models/kategori.dart';
+import 'package:tetrabit_toko_pos/models/merk.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
 import 'package:get/get.dart';
 import '../../../components/add_merk_produk_popup.dart';
 import '../../../routes/state_global.dart';

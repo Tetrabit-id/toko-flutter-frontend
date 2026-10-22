@@ -1,6 +1,6 @@
 {
-    "name": "diatera_pos",
-    "short_name": "diatera_pos",
+    "name": "tetrabit_toko_pos",
+    "short_name": "tetrabit_toko_pos",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

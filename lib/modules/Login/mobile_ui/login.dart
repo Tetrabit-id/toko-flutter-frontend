@@ -1,6 +1,6 @@
-import 'package:diatera_pos/modules/Login/mobile_ui/login_karyawan.dart';
-import 'package:diatera_pos/modules/Login/mobile_ui/login_owner.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/modules/Login/mobile_ui/login_karyawan.dart';
+import 'package:tetrabit_toko_pos/modules/Login/mobile_ui/login_owner.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

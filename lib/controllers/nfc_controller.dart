@@ -5,7 +5,7 @@ import 'dart:typed_data';
 // ignore: depend_on_referenced_packages
 import 'package:convert/convert.dart';
 
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/platform_tags.dart';

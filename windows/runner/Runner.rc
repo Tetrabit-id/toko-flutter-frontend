@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "diatera_pos" "\0"
+            VALUE "FileDescription", "tetrabit_toko_pos" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "diatera_pos" "\0"
+            VALUE "InternalName", "tetrabit_toko_pos" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "diatera_pos.exe" "\0"
-            VALUE "ProductName", "diatera_pos" "\0"
+            VALUE "OriginalFilename", "tetrabit_toko_pos.exe" "\0"
+            VALUE "ProductName", "tetrabit_toko_pos" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

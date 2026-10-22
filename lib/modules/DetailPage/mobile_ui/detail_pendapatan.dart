@@ -1,6 +1,6 @@
-import 'package:diatera_pos/modules/DetailPage/mobile_ui/components/income_per_pelanggan.dart';
-import 'package:diatera_pos/modules/DetailPage/mobile_ui/components/income_per_product.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/modules/DetailPage/mobile_ui/components/income_per_pelanggan.dart';
+import 'package:tetrabit_toko_pos/modules/DetailPage/mobile_ui/components/income_per_product.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

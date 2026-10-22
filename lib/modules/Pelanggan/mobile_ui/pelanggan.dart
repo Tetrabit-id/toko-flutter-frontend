@@ -1,4 +1,4 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
+import 'package:tetrabit_toko_pos/components/loading_cilcular.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 

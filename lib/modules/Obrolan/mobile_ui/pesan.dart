@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:diatera_pos/routes/state_global.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

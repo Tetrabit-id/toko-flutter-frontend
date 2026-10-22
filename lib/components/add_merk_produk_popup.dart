@@ -1,4 +1,4 @@
-import 'package:diatera_pos/constructors/text_style.dart';
+import 'package:tetrabit_toko_pos/constructors/text_style.dart';
 import 'package:flutter/material.dart';
 
 import '../constructors/text_field_rounded.dart';
