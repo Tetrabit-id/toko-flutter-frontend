@@ -22,7 +22,7 @@ class _IndexGudangPageState extends State<IndexGudangPage> {
   Widget build(BuildContext context) {
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           body: Responsive.isMobile(context)
               ? screensStok[navigation]
@@ -50,7 +50,7 @@ class _IndexGudangPageState extends State<IndexGudangPage> {
                               const Color.fromARGB(0, 255, 255, 255),
                           backgroundColor: Colors.white,
                           height: 65,
-                          labelTextStyle: MaterialStateProperty.all(
+                          labelTextStyle: WidgetStateProperty.all(
                               const TextStyle(
                                   fontSize: 12, fontFamily: "Lato"))),
                       child: NavigationBar(

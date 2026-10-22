@@ -81,7 +81,7 @@ class _SelectMemberKasirPageState extends State<SelectMemberKasirPage> {
                   var name = memberName[index];
 
                   return MediaQuery(
-                    data: querySize.copyWith(textScaleFactor: 0.81),
+                    data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
                     child: ListTile(
                       title: Text(name),
                       trailing: Text(

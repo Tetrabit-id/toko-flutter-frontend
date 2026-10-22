@@ -23,7 +23,7 @@ class _WelcomePageMobileState extends State<WelcomePageMobile> {
     return box.hasData('token')
         ? Container(color: Colors.white, child: const LoadingCilcular())
         : MediaQuery(
-            data: querySize.copyWith(textScaleFactor: 0.81),
+            data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
             child: Scaffold(
               backgroundColor: Colors.white,
               body: SizedBox(

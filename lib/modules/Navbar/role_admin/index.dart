@@ -23,7 +23,7 @@ class _IndexPageState extends State<IndexPage> {
     if (navigation >= tabs.length) navigation = 0;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           body: Responsive.isMobile(context)
               ? screens[tabs[navigation]]
@@ -45,7 +45,7 @@ class _IndexPageState extends State<IndexPage> {
                         indicatorColor: const Color.fromARGB(0, 255, 255, 255),
                         backgroundColor: Colors.white,
                         height: 65,
-                        labelTextStyle: MaterialStateProperty.all(
+                        labelTextStyle: WidgetStateProperty.all(
                             const TextStyle(fontSize: 12, fontFamily: "Lato"))),
                     child: NavigationBar(
                       selectedIndex: navigation,

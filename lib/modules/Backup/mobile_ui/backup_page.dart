@@ -83,7 +83,7 @@ class _BackupPageState extends State<BackupPage> {
     final querySize = MediaQuery.of(context);
     String? lastBackup = token.read('lastBackup');
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(

@@ -82,7 +82,7 @@ class _FilterStokKasirPageState extends State<FilterStokKasirPage> {
                   }
 
                   return MediaQuery(
-                    data: querySize.copyWith(textScaleFactor: 0.81),
+                    data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
                     child: ListTile(
                       title: Text(option.toString()),
                       trailing: Text(

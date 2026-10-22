@@ -15,7 +15,7 @@ class _PaymentInfoForKaryawanState extends State<PaymentInfoForKaryawan> {
     final querySize = MediaQuery.of(context);
     Size size = MediaQuery.of(context).size;
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(

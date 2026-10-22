@@ -232,13 +232,11 @@ class AddKasir extends GetxController {
 
       kasir.kembalian = num.parse(bayar) - kasir.totalPembelian;
       kasir.dataKasir.refresh();
-      Timer(
-          const Duration(seconds: 2),
-          () => {
-                kasir.checked.value = false,
-                kasir.open.value = true,
-                kasir.checkBayar.value = false,
-              });
+      Timer(const Duration(seconds: 2), () {
+        kasir.checked.value = false;
+        kasir.open.value = true;
+        kasir.checkBayar.value = false;
+      });
       // refresh stok
       stok.foundStok.clear();
       getApiStok.getAPI(token.read('_id'), token.read('cabangId'));
@@ -333,8 +331,10 @@ class AddKasir extends GetxController {
     simpanLokal = false;
     tersimpan = false;
     metode = 'cash';
-    Timer(const Duration(seconds: 1),
-        () => {kasir.open.value = false, kasir.checkBayar.value = true});
+    Timer(const Duration(seconds: 1), () {
+      kasir.open.value = false;
+      kasir.checkBayar.value = true;
+    });
   }
 
   // Transaksi, pesanan, potong stok, kasbon & poin dalam 1 DB transaction

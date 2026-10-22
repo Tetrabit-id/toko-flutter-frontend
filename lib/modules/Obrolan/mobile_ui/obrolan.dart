@@ -24,7 +24,7 @@ class _ObrolanPageState extends State<ObrolanPage> {
     var listKaryawan = getApiUsersK.dataUKaryawan;
 
     return MediaQuery(
-        data: querySize.copyWith(textScaleFactor: 0.81),
+        data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: headerObrolanPage(querySize.size, listKaryawan),

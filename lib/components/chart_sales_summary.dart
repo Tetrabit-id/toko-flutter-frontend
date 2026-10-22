@@ -69,8 +69,8 @@ class _ChartSummaryState extends State<ChartSummary> {
                           builder: (context, snapshot) {
                             return BarChart(BarChartData(
                               titlesData: FlTitlesData(
-                                rightTitles: AxisTitles(),
-                                topTitles: AxisTitles(),
+                                rightTitles: const AxisTitles(),
+                                topTitles: const AxisTitles(),
                                 bottomTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                         showTitles: true,
@@ -89,7 +89,7 @@ class _ChartSummaryState extends State<ChartSummary> {
                                         })),
                               ),
                               borderData: FlBorderData(show: false),
-                              gridData: FlGridData(
+                              gridData: const FlGridData(
                                 show: false,
                               ),
                               barTouchData: BarTouchData(

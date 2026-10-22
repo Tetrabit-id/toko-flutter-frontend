@@ -15,7 +15,7 @@ class IncomeProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Container(
         width: querySize.size.width,
         margin: const EdgeInsets.all(2),

@@ -32,7 +32,7 @@ class _HomePageMobileState extends State<HomePageMobile> {
     List dataChart = getDataSummary.dataSummaryChart;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(

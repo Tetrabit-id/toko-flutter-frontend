@@ -17,7 +17,7 @@ class WeekIncomeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var dataOnWeek = getDataSummary.dataSummaryChart;
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Container(
         width: querySize.size.width,
         margin: const EdgeInsets.all(2),

@@ -16,7 +16,7 @@ class HistoryPaymentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Container(
         width: querySize.size.width,
         margin: const EdgeInsets.only(top: 16, left: 2, right: 2, bottom: 2),

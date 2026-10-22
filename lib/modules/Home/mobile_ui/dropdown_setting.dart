@@ -13,7 +13,7 @@ class DropdownSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Padding(
         padding: const EdgeInsets.only(right: 10, left: 5, top: 4, bottom: 4),
         child: PopupMenuButton(

@@ -33,7 +33,7 @@ class PaymentDetailPage extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -48,7 +48,7 @@ class PaymentDetailPage extends StatelessWidget {
           elevation: 0,
           centerTitle: true,
           title: Text('Pembayaran ${info.nama}',
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 18)),
@@ -136,7 +136,7 @@ class PaymentDetailPage extends StatelessWidget {
                   color: AppColors.bgGrey,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey.withValues(alpha: 0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: const Offset(0, 90),
@@ -222,16 +222,21 @@ class PaymentDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               TextButton(
-                                  onPressed: () => Clipboard.setData(
-                                              ClipboardData(text: noRek))
-                                          .then((_) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                backgroundColor:
-                                                    AppColors.primaryColor,
-                                                content: Text(
-                                                    "No.Rek copied to clipboard")));
-                                      }),
+                                  onPressed: () {
+                                    // diambil sebelum await, context bisa
+                                    // sudah tidak valid saat clipboard selesai
+                                    final messenger =
+                                        ScaffoldMessenger.of(context);
+                                    Clipboard.setData(
+                                            ClipboardData(text: noRek))
+                                        .then((_) {
+                                      messenger.showSnackBar(const SnackBar(
+                                          backgroundColor:
+                                              AppColors.primaryColor,
+                                          content: Text(
+                                              "No.Rek copied to clipboard")));
+                                    });
+                                  },
                                   child: const Text(
                                     'Salin',
                                     style: TextStyle(

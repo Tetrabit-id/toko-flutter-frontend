@@ -54,7 +54,7 @@ class _SubUserPageState extends State<SubUserPage> {
     final querySize = MediaQuery.of(context);
     TextEditingController searchC = TextEditingController();
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: headerUserPage(querySize.size, searchC, () {
