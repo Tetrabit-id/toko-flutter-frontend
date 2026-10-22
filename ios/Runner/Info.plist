@@ -48,14 +48,14 @@
 		<key>UIStatusBarHidden</key>
 		<false/>
 		<key>NSCameraUsageDescription</key>
-	<string>Kamera digunakan untuk scan barcode produk dan mengambil foto produk.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Galeri digunakan untuk memilih foto produk.</string>
-	<key>NFCReaderUsageDescription</key>
-	<string>NFC digunakan untuk membaca kartu NFC.</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Bluetooth digunakan untuk terhubung ke printer struk.</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-</dict>
+		<string>Kamera digunakan untuk scan barcode produk dan mengambil foto produk.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Galeri digunakan untuk memilih foto produk.</string>
+		<key>NFCReaderUsageDescription</key>
+		<string>NFC digunakan untuk membaca kartu NFC.</string>
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>Bluetooth digunakan untuk terhubung ke printer struk.</string>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+	</dict>
 </plist>
