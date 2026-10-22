@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/env.dart';
 import '../../../routes/base_url.dart';
 import '../../../routes/state_global.dart';
 import '../../../style/styles.dart';
@@ -24,11 +25,11 @@ class PaymentDetailPage extends StatelessWidget {
           ? '5. Jika telah dikonfirmasi, Admin akan mengirimkan Kode Aktivasi via WhatsApp. Masukkan kode tersebut di halaman Aktivasi dan aplikasi Toko-mu sudah bisa digunakan tanpa internet.'
           : '5. Jika telah dikonfirmasi, Admin akan memberikan waktu penggunaan aplikasi kepadamu dan aplikasi Toko-mu sudah bisa digunakan.'
     ];
-    String noRek = '1234567890';
-    String noWa = '6285892660932';
+    String noRek = Env.rekeningNo;
+    String noWa = Env.waAdmin;
     String messageWa = Uri.encodeComponent(
         'Hai Pengguna Baru, Yuk isi data dirimu dulu\n\nPaket : ${info.nama}\nNama : ${token.read('name') ?? ''}\nEmail : ${token.read('email') ?? ''}\nNama Toko : ${token.read('store') ?? ''}\nWilayah :\n\n*sertakan bukti pembayaranmu dibawah pesan ini ya ;)');
-    String nmRek = 'PT Diatera Cipta Teknologi';
+    String nmRek = Env.rekeningNama;
     Size size = MediaQuery.of(context).size;
     final querySize = MediaQuery.of(context);
     return MediaQuery(

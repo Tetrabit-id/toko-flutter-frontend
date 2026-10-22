@@ -46,3 +46,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
+
+# Konfigurasi per lingkungan (--dart-define-from-file); contoh di env/example.json
+/env/*.json
+!/env/example.json

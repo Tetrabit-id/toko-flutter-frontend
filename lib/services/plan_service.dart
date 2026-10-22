@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../config/env.dart';
 import '../routes/base_url.dart';
 
 enum AppPlan { subscription, offline }
@@ -26,7 +27,7 @@ class PlanInfo {
 const planSubscription = PlanInfo(
   plan: AppPlan.subscription,
   nama: 'Paket Subscription',
-  harga: '100K / bulan',
+  harga: Env.hargaSubscription,
   masaAktif: 'Lifetime : 30 hari',
   fitur: [
     'Multi Cabang & Kirim Stok',
@@ -38,11 +39,10 @@ const planSubscription = PlanInfo(
   ],
 );
 
-// TODO: sesuaikan harga paket offline.
 const planOffline = PlanInfo(
   plan: AppPlan.offline,
   nama: 'Paket Offline',
-  harga: 'Hubungi Admin',
+  harga: Env.hargaOffline,
   masaAktif: 'Aktivasi kode : 1 perangkat',
   fitur: [
     'Kasir tanpa internet',

@@ -6,14 +6,15 @@ import 'package:cryptography/cryptography.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/env.dart';
 import '../models/license.dart';
 import '../routes/base_url.dart';
 import '../routes/route.dart';
 import '../routes/state_global.dart';
 
-// Public key Ed25519 dari backend (output LICENSE_PUBLIC_KEY di cmd/genkey).
+// Public key Ed25519 dari backend, diatur di env/*.json.
 // Aman ditanam di aplikasi; private key-nya hanya ada di server.
-const licensePublicKey = 'xwMXFR4EF6Laet/rD6NL4H0PzQPs0Tc/LaNZV/rMLlw=';
+const licensePublicKey = Env.licensePublicKey;
 
 class LicenseService extends GetxController {
   // Lisensi offline yang valid untuk perangkat ini, atau null.

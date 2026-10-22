@@ -1,3 +1,4 @@
+import 'package:tetrabit_toko_pos/config/env.dart';
 import 'package:tetrabit_toko_pos/routes/app_binding.dart';
 import 'package:tetrabit_toko_pos/routes/route.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,6 +19,7 @@ const webFirebaseOptions = FirebaseOptions(
 );
 
 void main() async {
+  Env.validate();
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp(options: kIsWeb ? webFirebaseOptions : null);

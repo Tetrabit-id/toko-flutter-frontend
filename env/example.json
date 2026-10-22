@@ -1,0 +1,10 @@
+{
+  "BASE_URL": "http://10.0.2.2:8000",
+  "BASE_URL_WS": "ws://10.0.2.2:8001",
+  "LICENSE_PUBLIC_KEY": "isi dengan LICENSE_PUBLIC_KEY dari cmd/genkey backend",
+  "WA_ADMIN": "628xxxxxxxxxx",
+  "REKENING_NO": "1234567890",
+  "REKENING_NAMA": "Nama Pemilik Rekening",
+  "HARGA_SUBSCRIPTION": "100K / bulan",
+  "HARGA_OFFLINE": "Hubungi Admin"
+}
