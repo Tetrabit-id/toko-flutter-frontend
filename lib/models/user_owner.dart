@@ -5,6 +5,7 @@ class Owner {
   String? name;
   String? store;
   String? role;
+  String? plan;
   bool owner;
   bool statusPembayaran;
   String? token;
@@ -16,6 +17,7 @@ class Owner {
     this.name,
     this.store,
     this.role,
+    this.plan,
     this.owner = true,
     this.statusPembayaran = false,
     this.token,
@@ -29,6 +31,7 @@ class Owner {
       name: json['name'],
       store: json['store'],
       role: json['role'],
+      plan: json['plan'] ?? 'subscription',
       owner: json['owner'],
       statusPembayaran: json['statusPembayaran'],
       token: json['token'],

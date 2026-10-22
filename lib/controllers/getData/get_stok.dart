@@ -13,6 +13,18 @@ class GetStokAPI extends GetxController {
 
   // Function Get Data Stok
   Future<List> getAPI(String? id, String? idCabang) async {
+    // Paket offline: dari DB lokal
+    if (paket.isOffline) {
+      dataStok.assignAll(await localStok.getStok());
+      return dataStok;
+    }
+
+    // Subscription tanpa koneksi: dari cache terakhir
+    if (koneksi.terputus) {
+      dataStok.assignAll(await localStok.getStok(cabangId: idCabang));
+      return dataStok;
+    }
+
     try {
       var response = await http.get(
         Uri.parse(
@@ -39,10 +51,12 @@ class GetStokAPI extends GetxController {
 
       var stokData = (data as Map<String, dynamic>)['data'];
       dataStok.addAll(stokData);
+      localStok.cacheStok(idCabang, stokData);
 
       return dataStok;
     } catch (e) {
       print(e);
+      dataStok.assignAll(await localStok.getStok(cabangId: idCabang));
     }
     return dataStok;
   }

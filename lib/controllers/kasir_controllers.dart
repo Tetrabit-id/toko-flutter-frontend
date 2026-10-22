@@ -1,14 +1,23 @@
 import 'dart:async';
 
-import 'package:diatera_pos/models/kasir.dart';
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/models/kasir.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../components/midtrans_wait_popup.dart';
 import '../routes/state_global.dart';
+import '../style/styles.dart';
 
 class AddKasir extends GetxController {
   var dataKasir = List<Kasir>.empty().obs;
   var noInv = '';
+  // true: transaksi disimpan di HP (paket offline, atau subscription tanpa koneksi)
+  var simpanLokal = false;
+  // cash | midtrans
+  var metode = 'cash';
+  // pembayaran online yang sudah lunas langsung dicatat, transaksi() tidak mencatat ulang
+  var tersimpan = false;
   var namaDiskon = '';
   var falseKeyword = true;
 
@@ -205,14 +214,21 @@ class AddKasir extends GetxController {
     return;
   }
 
-  void bayar() {
+  void bayar() async {
     if (kasir.bayarC.text != '') {
       String bayar = (kasir.bayarC.text).replaceAll(',', '').substring(4);
 
       var idOwner = token.read('role') != 'admin'
           ? token.read('parentId')
           : token.read('_id');
-      postApiInsertPesanan.connectAPI(kasir.dataKasir.toList(), idOwner);
+      // Subscription tanpa koneksi ikut disimpan di HP, dikirim saat online
+      kasir.simpanLokal = paket.isOffline || !await koneksi.check();
+      if (kasir.simpanLokal) {
+        // Nomor invoice dibuat di HP; pesanan disimpan bersama transaksi()
+        kasir.noInv = await localTransaksi.newNoInvoice();
+      } else {
+        postApiInsertPesanan.connectAPI(kasir.dataKasir.toList(), idOwner);
+      }
 
       kasir.kembalian = num.parse(bayar) - kasir.totalPembelian;
       kasir.dataKasir.refresh();
@@ -233,47 +249,79 @@ class AddKasir extends GetxController {
     }
   }
 
-  void transaksi() async {
-    var idOwner = token.read('role') != 'admin'
-        ? token.read('parentId')
-        : token.read('_id');
-    await postApiInsertTransaksi.connectAPI(
-      idOwner,
-      token.read('cabangId'),
-      kasir.noInv,
-      DateTime.now().toString().substring(0, 10),
-      kasir.namaDiskon,
-      kasir.discountChecked.isTrue
-          ? kasir.discountByRp.isTrue
-              ? 'rp'
-              : '${kasir.diskonC.text}%'
-          : 'Tidak ada',
-      kasir.discount,
-      kasir.discountChecked.isTrue
-          ? kasir.totalPembelian + kasir.discount
-          : kasir.totalPembelian,
-      kasbon.kasbonActive.isTrue
-          ? 0
-          : num.parse(kasir.bayarC.text.substring(4).replaceAll(',', '')),
-      kasir.totalPembelian,
-      kasir.kembalian,
-    );
-
-    var member = getApiPelanggan.dataPelangganById;
-    if (kasbon.kasbonActive.isTrue && member.isNotEmpty) {
-      var data = await getApiTransaksi.getApi();
-      postApiInsertKasbon.connectAPI(
-          idOwner,
-          token.read('cabangId'),
-          member[0]['_id'],
-          member[0]['memberId'],
-          data.last['_id'],
-          '',
-          DateTime.now().toString().substring(0, 10));
+  // Pembayaran online Midtrans (paket subscription). Setelah lunas transaksi
+  // langsung dicatat (agar tidak hilang walau app tertutup), lalu alurnya sama
+  // seperti bayar tunai: kasir bisa cetak struk dan menekan simpan.
+  Future<void> bayarOnline() async {
+    if (totalPembelian <= 0) return;
+    if (!await koneksi.check()) {
+      snackbarNotif.unsuccess(
+          'Tidak ada koneksi', 'Pembayaran online membutuhkan internet');
+      return;
     }
 
-    if (member.isNotEmpty) {
-      putApiUpdatePoint.connectAPI(member[0]['_id'], member[0]['poin'] + 100);
+    var noInvoice = await localTransaksi.newNoInvoice();
+    var snap = await midtrans.createSnap(
+      noInvoice: noInvoice,
+      items: dataKasir.toList(),
+      discount: discount,
+    );
+    if (snap == null) return;
+
+    launchUrl(Uri.parse(snap['redirectUrl']),
+        mode: LaunchMode.inAppBrowserView);
+    bool? lunas = await Get.dialog<bool>(
+      PopUpMidtransWait(
+        orderId: snap['orderId'],
+        redirectUrl: snap['redirectUrl'],
+        amount: snap['amount'],
+      ),
+      barrierDismissible: false,
+    );
+    if (lunas != true) return;
+
+    // Dicatat lewat antrean sync dengan metode midtrans;
+    // server memastikan pembayaran untuk noInvoice ini sudah lunas.
+    noInv = noInvoice;
+    simpanLokal = true;
+    metode = 'midtrans';
+    bayarC.text = current.format(snap['amount']);
+    kembalian = 0;
+    await _checkoutLokal();
+    tersimpan = true;
+
+    dataKasir.refresh();
+    checked.value = false;
+    open.value = true;
+    checkBayar.value = false;
+  }
+
+  String? get _idOwner =>
+      token.read('role') != 'admin' ? token.read('parentId') : token.read('_id');
+
+  String get _tanggal => DateTime.now().toString().substring(0, 10);
+
+  String get _discountUnit => discountChecked.isTrue
+      ? discountByRp.isTrue
+          ? 'rp'
+          : '${diskonC.text}%'
+      : 'Tidak ada';
+
+  num get _subJumlahTransaksi =>
+      discountChecked.isTrue ? totalPembelian + discount : totalPembelian;
+
+  num get _jumlahPembayaran => kasbon.kasbonActive.isTrue
+      ? 0
+      : num.parse(bayarC.text.substring(4).replaceAll(',', ''));
+
+  void transaksi() async {
+    var member = getApiPelanggan.dataPelangganById;
+
+    if (simpanLokal) {
+      // pembayaran online sudah dicatat saat lunas
+      if (!tersimpan) await _checkoutLokal();
+    } else {
+      await _transaksiOnline(member);
     }
 
     dataKasir.clear();
@@ -282,8 +330,87 @@ class AddKasir extends GetxController {
     bayarC.clear();
     kembalian = 0;
     noInv = '';
+    simpanLokal = false;
+    tersimpan = false;
+    metode = 'cash';
     Timer(const Duration(seconds: 1),
         () => {kasir.open.value = false, kasir.checkBayar.value = true});
+  }
+
+  // Transaksi, pesanan, potong stok, kasbon & poin dalam 1 DB transaction
+  Future<void> _checkoutLokal() async {
+    var member = getApiPelanggan.dataPelangganById;
+    await localTransaksi.checkout(
+      userId: _idOwner,
+      pending: !paket.isOffline,
+      metode: metode,
+      noInvoice: noInv,
+      date: _tanggal,
+      discountName: namaDiskon,
+      discountUnit: _discountUnit,
+      discountAmount: discount,
+      subJumlahTransaksi: _subJumlahTransaksi,
+      jumlahPembayaran: _jumlahPembayaran,
+      jumlahTransaksi: totalPembelian,
+      kembalian: kembalian,
+      items: dataKasir.toList(),
+      member: member.isNotEmpty ? member[0] : null,
+      kasbon: kasbon.kasbonActive.isTrue,
+    );
+
+    if (paket.isOffline) {
+      snackbarNotif.success('Success', 'Transaksi berhasil tersimpan');
+    } else if (metode == 'midtrans') {
+      snackbarNotif.success('Pembayaran diterima', 'Transaksi tersimpan');
+      sinkron.trigger();
+    } else {
+      snackbarNotif.success('Tersimpan di HP',
+          'Tidak ada koneksi, transaksi dikirim otomatis saat online');
+      sinkron.refreshCount();
+    }
+
+    // refresh stok setelah stok terpotong
+    await getApiStok.getAPI(token.read('_id'), token.read('cabangId'));
+    stok.foundStok = getApiStok.dataStok;
+  }
+
+  Future<void> _transaksiOnline(List member) async {
+    var idOwner = _idOwner;
+    var date = _tanggal;
+    await postApiInsertTransaksi.connectAPI(
+      idOwner!,
+      token.read('cabangId'),
+      noInv,
+      date,
+      namaDiskon,
+      _discountUnit,
+      discount,
+      _subJumlahTransaksi,
+      _jumlahPembayaran,
+      totalPembelian,
+      kembalian,
+    );
+
+    if (kasbon.kasbonActive.isTrue && member.isNotEmpty) {
+      // Cari transaksi ini berdasarkan nomor invoice, bukan "transaksi terakhir"
+      // (bisa milik kasir lain, atau transaksi offline yang belum terkirim)
+      var data = await getApiTransaksi.getApi();
+      var transaksiIni = data.lastWhere(
+          (t) => t['noInvoice'] == kasir.noInv,
+          orElse: () => data.last);
+      postApiInsertKasbon.connectAPI(
+          idOwner,
+          token.read('cabangId'),
+          member[0]['_id'],
+          member[0]['memberId'],
+          transaksiIni['_id'],
+          '',
+          date);
+    }
+
+    if (member.isNotEmpty) {
+      putApiUpdatePoint.connectAPI(member[0]['_id'], member[0]['poin'] + 100);
+    }
   }
 
   void updateTotalPembelian() {

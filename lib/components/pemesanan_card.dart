@@ -1,9 +1,10 @@
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../routes/state_global.dart';
 import '../style/styles.dart';
+import 'produk_image.dart';
 
 class CardPemesananKasirPage extends StatefulWidget {
   const CardPemesananKasirPage({Key? key, this.index = 0}) : super(key: key);
@@ -105,11 +106,7 @@ class _CardPemesananKasirPageState extends State<CardPemesananKasirPage> {
                           decoration: BoxDecoration(
                               image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image: fotoBarang != null
-                                      ? Image.network(fotoBarang).image
-                                      : Image.asset(
-                                              'assets/img/bulog_toko_t.png')
-                                          .image)),
+                                  image: produkImage(fotoBarang))),
                         ),
                         Expanded(
                             child: Column(

@@ -1,12 +1,13 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:diatera_pos/constructors/button_primary.dart';
-import 'package:diatera_pos/constructors/text_field_default.dart';
-import 'package:diatera_pos/constructors/text_style.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/constructors/button_primary.dart';
+import 'package:tetrabit_toko_pos/constructors/text_field_default.dart';
+import 'package:tetrabit_toko_pos/constructors/text_style.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 
 import '../../../routes/route.dart';
 import '../../../routes/state_global.dart';
+import '../../../services/plan_service.dart';
 
 class SignUpPageMobile extends StatefulWidget {
   const SignUpPageMobile({Key? key}) : super(key: key);
@@ -68,7 +69,28 @@ class _SignUpPageMobileState extends State<SignUpPageMobile> {
                                 'Buat Akunmu dan kendalikan seluruh transaksi penjualanmu.',
                                 TextAlign.start,
                               ),
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Chip(
+                                    backgroundColor: AppColors.primaryColor,
+                                    label: Text(
+                                      postApiRegisterO.plan == 'offline'
+                                          ? planOffline.nama
+                                          : planSubscription.nama,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Get.back(),
+                                    child: const Text('Ganti Paket',
+                                        style: TextStyle(
+                                            color: AppColors.primaryColor)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
                             ])),
                     buttonPrimaryImg(
                       'Daftar dengan Google',

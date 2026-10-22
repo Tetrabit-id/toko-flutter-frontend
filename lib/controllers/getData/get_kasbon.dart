@@ -12,6 +12,13 @@ class GetKasbonAPI extends GetxController {
 
   // Function Get Data Pesanan
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal
+    // Subscription tanpa koneksi: cache terakhir + kasbon yang belum terkirim
+    if (paket.isOffline || koneksi.terputus) {
+      dataKasbon.assignAll(await localPelanggan.getKasbon());
+      return dataKasbon;
+    }
+
     try {
       var response = await http.get(
         Uri.parse(
@@ -39,10 +46,14 @@ class GetKasbonAPI extends GetxController {
 
       var kasbonData = (data as Map<String, dynamic>)['data'];
       dataKasbon.addAll(kasbonData);
+      await localPelanggan.cacheKasbon(kasbonData);
+      // termasuk kasbon dari transaksi offline yang belum terkirim
+      dataKasbon.addAll(await localPelanggan.getPendingKasbon());
 
       return dataKasbon;
     } catch (e) {
       print(e);
+      dataKasbon.assignAll(await localPelanggan.getKasbon());
     }
     return dataKasbon;
   }

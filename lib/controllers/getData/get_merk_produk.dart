@@ -13,6 +13,22 @@ class GetMerkProdukAPI extends GetxController {
 
   // Function Get Data Pesanan
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal, merk default 'All' dibuat otomatis
+    if (paket.isOffline) {
+      var merkData = await localStok.getMerk();
+      if (merkData.isEmpty) {
+        await localStok.insertMerk('All', 'All');
+        merkData = await localStok.getMerk();
+      }
+      dataMerkProduk.assignAll(merkData.map((e) => Merk(
+            id: e['_id'],
+            code: e['code'],
+            name: e['name'],
+            userId: e['userId'],
+          )));
+      return dataMerkProduk;
+    }
+
     try {
       var idOwner = token.read('role') != 'admin'
           ? token.read('parentId')

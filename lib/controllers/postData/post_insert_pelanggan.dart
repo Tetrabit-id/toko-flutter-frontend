@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,6 +19,40 @@ class InsertPelangganAPI extends GetxController {
     String phone,
     String? address,
   ) async {
+    // Paket offline: disimpan lokal, member ID dibuat di HP jika tanpa kartu NFC
+    // Subscription tanpa koneksi: disimpan di HP, dikirim saat online
+    if (paket.isOffline || koneksi.terputus) {
+      var error = await localPelanggan.insertPelanggan(
+        pending: !paket.isOffline,
+        cabangId: cabangId,
+        memberId: memberId,
+        nik: nik,
+        email: email,
+        name: name.capitalizeFirst,
+        phone: phone,
+        address: address,
+      );
+      if (error != null) {
+        snackbarNotif.unsuccess('Unsuccess', error);
+        return;
+      }
+      if (paket.isOffline) {
+        snackbarNotif.success('Success', 'Pelanggan telah ditambahkan');
+      } else {
+        snackbarNotif.success('Tersimpan di HP',
+            'Tidak ada koneksi, pelanggan dikirim otomatis saat online');
+        sinkron.refreshCount();
+      }
+      pelanggan.emailNewPlgnC.clear();
+      pelanggan.nameNewPlgnC.clear();
+      pelanggan.phoneNewPlgnC.clear();
+      pelanggan.addressNewPlgnC.clear();
+      pelanggan.nikNewPlgnC.clear();
+      pelanggan.cabangIdPlgnC = '';
+      nfc.dataNfc.value = '';
+      return;
+    }
+
     try {
       var response = await http.post(Uri.parse('$baseUrl/memberships'),
           body: json.encode({

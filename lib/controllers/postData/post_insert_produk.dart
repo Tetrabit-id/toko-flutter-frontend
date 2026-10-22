@@ -3,8 +3,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,6 +23,28 @@ class InsertProdukAPI extends GetxController {
     String? file,
     int hargaBeli,
   ) async {
+    // Paket offline: produk + stok disimpan lokal, foto disalin ke folder app
+    if (paket.isOffline) {
+      var error = await localStok.insertProduk(
+        produkKategoriId: produkKategoriId,
+        produkMerkId: produkMerkId,
+        code: kodeBarang ?? '',
+        name: namaBarang ?? '',
+        qty: qty,
+        satuan: satuan,
+        harga: hargaBarang,
+        hargaModal: hargaBeli,
+        file: file,
+      );
+      if (error != null) {
+        snackbarNotif.unsuccess('Unsuccess', error);
+        return;
+      }
+      snackbarNotif.success('Success', 'Produk telah ditambahkan');
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var request = http.MultipartRequest(
         'POST',

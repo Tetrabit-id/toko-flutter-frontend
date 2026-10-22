@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +10,13 @@ import '../../routes/state_global.dart';
 
 class UpdateAkunAPI extends GetxController {
   Future<void> connectAPI(String? name, String? toko) async {
+    // Akun tersimpan di server, jadi perubahan butuh internet (kedua paket)
+    if (!await koneksi.check()) {
+      snackbarNotif.unsuccess(
+          'Tidak ada koneksi', 'Edit akun membutuhkan internet');
+      return;
+    }
+
     try {
       var response = await http.put(
           Uri.parse('$baseUrl/users/${token.read('_id')}'),

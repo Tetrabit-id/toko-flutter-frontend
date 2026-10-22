@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +14,18 @@ class InsertMerkProdukAPI extends GetxController {
     String? code,
     String? name,
   ) async {
+    // Paket offline: disimpan lokal
+    if (paket.isOffline) {
+      await localStok.insertMerk(code, name);
+      await getApiMerkProduk.getApi();
+      if (getApiMerkProduk.dataMerkProduk.length > 1) {
+        Get.back();
+        snackbarNotif.success('Success', 'Merk produk telah ditambahkan');
+      }
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.post(Uri.parse('$baseUrl/produk-merk'),
           body: json.encode({

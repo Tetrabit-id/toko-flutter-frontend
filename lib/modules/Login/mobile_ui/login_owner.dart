@@ -1,4 +1,4 @@
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -127,7 +127,7 @@ class _LoginOwnerState extends State<LoginOwner> {
               paragrafSecond(
                   'Baru pertama kali pakai App?    ', TextAlign.center),
               GestureDetector(
-                onTap: () => Get.toNamed(RouteName.signUpMobile),
+                onTap: () => Get.toNamed(RouteName.choosePlan),
                 child: const Text(
                   "Daftar",
                   style: TextStyle(

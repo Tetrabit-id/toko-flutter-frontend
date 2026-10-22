@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +14,16 @@ class UpdateRekapKasAPI extends GetxController {
     int? kasAkhir,
     int? selisih,
   ) async {
+    // Paket offline, atau rekap kas subscription yang belum terkirim: lokal
+    if (paket.isOffline || await localRekapKas.isPending(idRekapKas)) {
+      await localRekapKas.updateRekapKas(idRekapKas, kasAkhir, selisih);
+      Get.back();
+      snackbarNotif.success('Success', 'Tutup buku berhasil');
+      rekapKas.kasAkhirNewRekapC.clear();
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.put(
           Uri.parse(

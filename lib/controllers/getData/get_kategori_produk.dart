@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:diatera_pos/models/kategori.dart';
+import 'package:tetrabit_toko_pos/models/kategori.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,6 +13,23 @@ class GetKategoriProdukAPI extends GetxController {
 
   // Function Get Data Pesanan
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal, kategori default 'All' dibuat otomatis
+    if (paket.isOffline) {
+      var kategoriData = await localStok.getKategori();
+      if (kategoriData.isEmpty) {
+        await localStok.insertKategori('All', 'All');
+        kategoriData = await localStok.getKategori();
+      }
+      dataKategoriProduk.assignAll(kategoriData.map((e) => Kategori(
+            id: e['_id'],
+            code: e['code'],
+            name: e['name'],
+            userId: e['userId'],
+            image: e['image'],
+          )));
+      return dataKategoriProduk;
+    }
+
     try {
       var idOwner = token.read('role') != 'admin'
           ? token.read('parentId')

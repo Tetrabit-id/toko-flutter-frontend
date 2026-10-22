@@ -1,14 +1,12 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:diatera_pos/components/filter_stok_kasir.dart';
-import 'package:diatera_pos/constructors/button_primary.dart';
-import 'package:diatera_pos/style/styles.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:tetrabit_toko_pos/components/filter_stok_kasir.dart';
+import 'package:tetrabit_toko_pos/constructors/button_primary.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 
 import '../../../components/add_diskon_popup.dart';
 import '../../../components/select_member_kasir.dart';
 import '../../../constructors/text_field_rounded.dart';
-import '../../../controllers/xendit_controller.dart';
 import '../../../routes/state_global.dart';
 import 'components/body_orderan.dart';
 
@@ -27,15 +25,6 @@ class _KasirPageforTabletState extends State<KasirPageforTablet> {
   void initState() {
     super.initState();
     kasir.dataKasir;
-  }
-
-  void createInvoice(num pembelian) async {
-    if (pembelian <= 0) {
-      return;
-    }
-
-    String url = await XenditService().createInvoice(pembelian);
-    launchUrl(Uri.parse(url));
   }
 
   void addDiscount() async {
@@ -640,13 +629,16 @@ class _KasirPageforTabletState extends State<KasirPageforTablet> {
                   builder: (context, snapshot) {
                     return Obx(
                       () => ElevatedButton(
-                          onPressed: kasbon.kasbonActive.isFalse &&
+                          // Paket offline: tunai saja, tanpa payment gateway
+                          onPressed: paket.canPaymentGateway &&
+                                  kasbon.kasbonActive.isFalse &&
                                   kasir.totalPembelian > 0
-                              ? () => createInvoice(kasir.totalPembelian)
+                              ? () => kasir.bayarOnline()
                               : null,
                           style: ElevatedButton.styleFrom(
                               fixedSize: Size((size.width / 6) - 20, 38),
-                              backgroundColor: kasir.checkBayar.value &&
+                              backgroundColor: paket.canPaymentGateway &&
+                                      kasir.checkBayar.value &&
                                       kasir.totalPembelian > 0
                                   ? AppColors.primaryColor
                                   : Colors.grey,

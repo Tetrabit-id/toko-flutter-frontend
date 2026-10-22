@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,6 +20,23 @@ class UpdateProdukAPI extends GetxController {
     int hargaBarang,
     int hargaBeli,
   ) async {
+    // Paket offline: disimpan lokal
+    if (paket.isOffline) {
+      await localStok.updateStok(
+        stokId: stokId ?? '',
+        produkId: produkId,
+        name: namaBarang,
+        qty: qty,
+        satuan: satuan,
+        harga: hargaBarang,
+        hargaModal: hargaBeli,
+      );
+      Get.back();
+      snackbarNotif.success('Success', 'Produk telah diupdate');
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.put(Uri.parse('$baseUrl/stok-cabang/$stokId'),
           body: json.encode({

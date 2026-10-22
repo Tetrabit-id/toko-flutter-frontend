@@ -18,6 +18,8 @@ class InsertPengirimanAPI extends GetxController {
     String? kodeBarang,
     int qty,
   ) async {
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.post(
         Uri.parse('$baseUrl/pengiriman/$userId/get-by-owner/direct'),

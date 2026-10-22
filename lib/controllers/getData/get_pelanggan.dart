@@ -13,6 +13,13 @@ class GetPelangganAPI extends GetxController {
 
   // Function Get Data Pelanggan
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal
+    // Subscription tanpa koneksi: cache terakhir + pelanggan baru yang belum terkirim
+    if (paket.isOffline || koneksi.terputus) {
+      dataPelanggan.assignAll(await localPelanggan.getPelanggan());
+      return dataPelanggan;
+    }
+
     try {
       var response = await http.get(
         Uri.parse(
@@ -40,15 +47,31 @@ class GetPelangganAPI extends GetxController {
 
       var pelangganData = (data as Map<String, dynamic>)['data'];
       dataPelanggan.addAll(pelangganData);
+      await localPelanggan.cachePelanggan(pelangganData);
+      // termasuk pelanggan baru yang dibuat offline dan belum terkirim
+      dataPelanggan.addAll(await localPelanggan.getPending());
       return dataPelanggan;
     } catch (e) {
       print(e);
+      dataPelanggan.assignAll(await localPelanggan.getPelanggan());
     }
     return dataPelanggan;
   }
 
   // Function Get Data Pelanggan
   Future<List> getByIdApi(String idMember) async {
+    // Paket offline: dari DB lokal
+    // Subscription tanpa koneksi: dari cache pelanggan
+    if (paket.isOffline || koneksi.terputus) {
+      var member = await localPelanggan.getPelangganById(idMember);
+      if (member == null) {
+        snackbarNotif.unsuccess('Unsuccess', 'Member tidak ditemukan');
+        return dataPelangganById;
+      }
+      dataPelangganById.assignAll([member]);
+      return dataPelangganById;
+    }
+
     try {
       var response = await http.get(
         Uri.parse('$baseUrl/memberships/$idMember'),
@@ -78,6 +101,8 @@ class GetPelangganAPI extends GetxController {
       return dataPelangganById;
     } catch (e) {
       print(e);
+      var member = await localPelanggan.getPelangganById(idMember);
+      if (member != null) dataPelangganById.assignAll([member]);
     }
     return dataPelangganById;
   }

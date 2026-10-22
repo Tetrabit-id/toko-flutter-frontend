@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,6 +11,9 @@ class GetReportProduk extends GetxController {
   final dataProduk = List.empty().obs;
 
   Future<List> getApi() async {
+    // Belum dipakai UI; paket offline tidak memanggil server
+    if (paket.isOffline) return dataProduk;
+
     try {
       var response = await http.get(
         Uri.parse('$baseUrl/produk/${token.read('_id')}/get-by-owner/report'),
