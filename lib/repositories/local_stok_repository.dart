@@ -3,7 +3,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -157,6 +159,16 @@ class LocalStokRepository extends GetxController {
     });
   }
 
+  // Pesan error jika gagal, null jika berhasil
+  Future<String?> deleteKategori(String? id) async {
+    var db = await localDb.db;
+    var dipakai = await db.query('stok',
+        where: 'produkKategoriId = ?', whereArgs: [id], limit: 1);
+    if (dipakai.isNotEmpty) return 'Kategori masih dipakai barang di stok';
+    await db.delete('kategori', where: '_id = ?', whereArgs: [id]);
+    return null;
+  }
+
   Future<List<Map<String, dynamic>>> getMerk() async {
     var db = await localDb.db;
     return db.query('merk', orderBy: 'name COLLATE NOCASE');
@@ -172,11 +184,28 @@ class LocalStokRepository extends GetxController {
     });
   }
 
+  // Pesan error jika gagal, null jika berhasil
+  Future<String?> deleteMerk(String? id) async {
+    var db = await localDb.db;
+    var dipakai = await db.query('stok',
+        where: 'produkMerkId = ?', whereArgs: [id], limit: 1);
+    if (dipakai.isNotEmpty) return 'Merk masih dipakai barang di stok';
+    await db.delete('merk', where: '_id = ?', whereArgs: [id]);
+    return null;
+  }
+
   // File dari image_picker ada di folder cache yang bisa dihapus sistem,
-  // jadi disalin ke folder dokumen aplikasi.
+  // jadi disalin ke folder dokumen aplikasi. Web tidak punya folder aplikasi,
+  // jadi foto disimpan sebagai data URI di kolom `file`.
   Future<String?> _simpanFoto(String? path) async {
     if (path == null || path.isEmpty) return null;
     try {
+      if (kIsWeb) {
+        var foto = XFile(path);
+        return UriData.fromBytes(await foto.readAsBytes(),
+                mimeType: foto.mimeType ?? 'image/jpeg')
+            .toString();
+      }
       var dir = Directory(
           join((await getApplicationDocumentsDirectory()).path, 'produk'));
       await dir.create(recursive: true);
@@ -190,7 +219,7 @@ class LocalStokRepository extends GetxController {
   }
 
   void _hapusFoto(String? path) {
-    if (path == null) return;
+    if (path == null || kIsWeb) return;
     File(path).delete().catchError((e) {
       print(e);
       return File(path);

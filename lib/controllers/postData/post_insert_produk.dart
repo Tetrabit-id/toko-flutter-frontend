@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 class InsertProdukAPI extends GetxController {
   // fungsi insert katagori produk
@@ -56,11 +56,11 @@ class InsertProdukAPI extends GetxController {
         'Content-Type': 'multipart/form-data'
       });
 
-      var dataImg = http.MultipartFile(
+      // XFile bisa membaca path file (HP) maupun blob URL (web)
+      var dataImg = http.MultipartFile.fromBytes(
         'file',
-        File(file!).readAsBytes().asStream(),
-        File(file).lengthSync(),
-        filename: file.split('/').last,
+        await XFile(file!).readAsBytes(),
+        filename: picker.image?.name ?? file.split('/').last,
       );
 
       var produk = json.encode({

@@ -123,6 +123,18 @@ class LocalTransaksiRepository extends GetxController {
   Future<void> cacheTransaksi(List rows) =>
       localDb.replaceCache('transaksi', rows);
 
+  // Pendapatan per produk antara dua tanggal (yyyy-MM-dd), terbesar dulu
+  Future<List<Map<String, dynamic>>> getPendapatanPerProduk(
+      String start, String end) async {
+    var db = await localDb.db;
+    return db.rawQuery('''
+      SELECT p.name, p.code, SUM(p.qty) AS qty, SUM(p.total) AS total
+      FROM pesanan p JOIN transaksi t ON t.noInvoice = p.noInvoice
+      WHERE substr(t.date, 1, 10) BETWEEN ? AND ?
+      GROUP BY p.produkId, p.name
+      ORDER BY total DESC''', [start, end]);
+  }
+
   // Item pesanan untuk popup invoice & cetak ulang struk
   Future<List<Map<String, dynamic>>> getPesananByInvoice(String noInv) async {
     var db = await localDb.db;

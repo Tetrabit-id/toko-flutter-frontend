@@ -29,16 +29,16 @@ class StokController extends GetxController {
 
   String validasiText = '';
 
-  Future<List> getOutStok(String id, String idCabang) async {
+  Future<List> getOutStok(String? id, String? idCabang) async {
     await getApiStok.getAPI(id, idCabang);
-    outStok = getApiStok.dataStok.where((data) => data['qty'] < 0).toList();
+    outStok = getApiStok.dataStok.where((data) => (data['qty'] ?? 0) < 0).toList();
     return outStok;
   }
 
-  Future<List> getAvailableStok(String id, String idCabang) async {
+  Future<List> getAvailableStok(String? id, String? idCabang) async {
     await getApiStok.getAPI(id, idCabang);
     availableStok =
-        getApiStok.dataStok.where((data) => data['qty'] == 0).toList();
+        getApiStok.dataStok.where((data) => (data['qty'] ?? 0) == 0).toList();
     return availableStok;
   }
 

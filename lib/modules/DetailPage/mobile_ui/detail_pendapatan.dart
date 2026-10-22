@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../style/styles.dart';
 import 'components/check_available_card.dart';
 import 'components/history_payment_card.dart';
 import 'components/monthly_income_card.dart';
@@ -26,16 +27,14 @@ class _DetailPageState extends State<DetailPage> {
     return MediaQuery(
       data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bgGrey,
         appBar: AppBar(
-          leading: GestureDetector(
-            onTap: () => Get.back(),
-            child: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.black87,
-            ),
+          leading: IconButton(
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
           ),
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           title: const Text('Detail Pendapatanmu',
@@ -48,37 +47,34 @@ class _DetailPageState extends State<DetailPage> {
             future: getApiTransaksi.getApi(),
             initialData: getApiTransaksi.dataLaporan,
             builder: (context, snapshot) {
-              if (snapshot.data != null) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  var data = snapshot.data!;
-                  return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 0),
-                      child: ListView(children: [
-                        HistoryPaymentCard(querySize: querySize, data: data),
-                        const SizedBox(height: 20),
-                        CheckAvailableCard(data: data, querySize: querySize),
-                        const SizedBox(height: 20),
-                        MonthlyIncomeCard(
-                          querySize: querySize,
-                          dateNow: dateNow,
-                        ),
-                        const SizedBox(height: 20),
-                        IncomeProductCard(
-                            querySize: querySize, dateNow: dateNow),
-                        const SizedBox(height: 20),
-                        WeekIncomeCard(querySize: querySize, dateNow: dateNow),
-                        const SizedBox(height: 20),
-                        IncomePelangganCard(
-                            querySize: querySize, dateNow: dateNow),
-                      ]));
-                }
-                return SizedBox(
-                  width: querySize.size.width,
-                  child: const Center(child: CircularProgressIndicator()),
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                      color: AppColors.primaryColor, strokeWidth: 2),
                 );
               }
-              return const Text('No Data');
+
+              var data = snapshot.data ?? [];
+              return RefreshIndicator(
+                color: AppColors.primaryColor,
+                onRefresh: () async => setState(() {}),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    HistoryPaymentCard(data: data),
+                    const SizedBox(height: 12),
+                    CheckAvailableCard(data: data),
+                    const SizedBox(height: 12),
+                    MonthlyIncomeCard(dateNow: dateNow),
+                    const SizedBox(height: 12),
+                    IncomeProductCard(dateNow: dateNow),
+                    const SizedBox(height: 12),
+                    const WeekIncomeCard(),
+                    const SizedBox(height: 12),
+                    IncomePelangganCard(dateNow: dateNow),
+                  ],
+                ),
+              );
             }),
       ),
     );

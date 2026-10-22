@@ -45,6 +45,7 @@ import '../controllers/edit_stok_controller.dart';
 import '../controllers/postData/post_register_o_api.dart';
 import '../controllers/snackbar.dart';
 import '../controllers/summary_chart_controller.dart';
+import '../controllers/getData/get_report_produk.dart';
 import '../controllers/invoice_payment_controllers.dart';
 import '../controllers/kasir_controllers.dart';
 import '../controllers/auth_controllers.dart';
@@ -126,6 +127,7 @@ class AppBinding implements Bindings {
     Get.put(Snackbar());
     Get.put(TransaksiController());
     Get.put(GetDataSummary());
+    Get.put(GetReportProduk());
     Get.put(PrinterController());
     Get.put(ObrolanController());
     Get.put(AddKasbon());

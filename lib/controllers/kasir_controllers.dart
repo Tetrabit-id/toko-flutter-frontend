@@ -389,6 +389,7 @@ class AddKasir extends GetxController {
       _jumlahPembayaran,
       totalPembelian,
       kembalian,
+      membershipsId: member.isNotEmpty ? member[0]['_id'] : null,
     );
 
     if (kasbon.kasbonActive.isTrue && member.isNotEmpty) {

@@ -65,7 +65,7 @@ class _StokPageState extends State<StokPage>
         floatingActionButton: token.read('role') == 'Kasir'
             ? const SizedBox()
             : IconButton(
-                iconSize: 50,
+                iconSize: 56,
                 onPressed: () async {
                   await getApiKategoriProduk.getApi();
                   await getApiMerkProduk.getApi();
@@ -77,7 +77,7 @@ class _StokPageState extends State<StokPage>
                   setState(() {});
                   String idcabang = '';
                   if (getApiCabang.dataCabangOwner.length < 2) {
-                    idcabang = token.read('cabangId');
+                    idcabang = token.read('cabangId') ?? localDb.cabangId;
                   } else {
                     String? id = getApiCabang.dataCabangOwner[tabC.index].id;
                     if (id != null) {
@@ -92,11 +92,11 @@ class _StokPageState extends State<StokPage>
                   }
                 },
                 icon: Container(
-                    width: 100,
-                    height: 100,
+                    width: 56,
+                    height: 56,
                     decoration: const BoxDecoration(
                         color: AppColors.secondaryColor,
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                        borderRadius: BorderRadius.all(Radius.circular(28))),
 
                     // ignore: prefer_const_constructors
                     child: Icon(

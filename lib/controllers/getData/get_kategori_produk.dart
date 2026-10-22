@@ -11,6 +11,47 @@ import '../../routes/state_global.dart';
 class GetKategoriProdukAPI extends GetxController {
   final dataKategoriProduk = List<Kategori>.empty().obs;
 
+  // Hapus kategori. Paket offline: dari DB lokal; subscription: ke server.
+  Future<bool> delete(String? id) async {
+    if (paket.isOffline) {
+      var error = await localStok.deleteKategori(id);
+      if (error != null) {
+        snackbarNotif.unsuccess('Gagal menghapus', error);
+        return false;
+      }
+      await getApi();
+      return true;
+    }
+    if (koneksi.butuhInternet()) return false;
+
+    try {
+      var idOwner = token.read('role') != 'admin'
+          ? token.read('parentId')
+          : token.read('_id');
+      var response = await http.delete(
+        Uri.parse('$baseUrl/produk-kategori/$idOwner/get-by-owner/$id/delete'),
+        headers: {'Authorization': 'Bearer ${token.read('token')}'},
+      );
+
+      if (response.statusCode != 200) {
+        var data = jsonDecode(response.body);
+        snackbarNotif.unsuccess(
+          'Gagal menghapus',
+          '${(data['message']).toString().capitalizeFirst}',
+        );
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      snackbarNotif.unsuccess(
+          'Gagal menghapus', 'Tidak bisa terhubung ke server');
+      return false;
+    }
+
+    await getApi();
+    return true;
+  }
+
   // Function Get Data Pesanan
   Future<List> getApi() async {
     // Paket offline: dari DB lokal, kategori default 'All' dibuat otomatis

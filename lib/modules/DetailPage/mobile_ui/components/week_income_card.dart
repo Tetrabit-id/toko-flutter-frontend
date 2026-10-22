@@ -2,91 +2,107 @@ import 'package:flutter/material.dart';
 
 import '../../../../routes/state_global.dart';
 import '../../../../style/styles.dart';
+import 'detail_card.dart';
+
+const _hari = {
+  'Monday': 'Senin',
+  'Tuesday': 'Selasa',
+  'Wednesday': 'Rabu',
+  'Thursday': 'Kamis',
+  'Friday': 'Jumat',
+  'Saturday': 'Sabtu',
+  'Sunday': 'Minggu',
+};
 
 class WeekIncomeCard extends StatelessWidget {
-  const WeekIncomeCard({
-    super.key,
-    required this.querySize,
-    required this.dateNow,
-  });
-
-  final MediaQueryData querySize;
-  final String dateNow;
+  const WeekIncomeCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     var dataOnWeek = getDataSummary.dataSummaryChart;
-    return MediaQuery(
-      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
-      child: Container(
-        width: querySize.size.width,
-        margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [
-            BoxShadow(
-                color: Colors.black26, blurRadius: 3, offset: Offset(0, 0))
-          ],
-          color: Colors.white,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+    num tertinggi = dataOnWeek.fold<num>(
+        0, (a, e) => (e['data'] as num) > a ? e['data'] : a);
+
+    return DetailCard(
+      icon: Icons.date_range_rounded,
+      title: 'Pendapatan Per Hari',
+      subtitle: '7 hari terakhir',
+      child: dataOnWeek.isEmpty
+          ? const KosongDetail(
+              icon: Icons.event_busy_rounded,
+              text: 'Belum ada data minggu ini',
+            )
+          : Column(
+              children: [
+                for (var i = 0; i < dataOnWeek.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 12),
+                  _BarisHari(
+                    hari: _hari[dataOnWeek[i]['day']] ??
+                        '${dataOnWeek[i]['day']}',
+                    tanggal: '${dataOnWeek[i]['tgl']}',
+                    nilai: dataOnWeek[i]['data'],
+                    proporsi:
+                        tertinggi == 0 ? 0 : dataOnWeek[i]['data'] / tertinggi,
+                  ),
+                ],
+              ],
+            ),
+    );
+  }
+}
+
+class _BarisHari extends StatelessWidget {
+  const _BarisHari({
+    required this.hari,
+    required this.tanggal,
+    required this.nilai,
+    required this.proporsi,
+  });
+
+  final String hari;
+  final String tanggal;
+  final num nilai;
+  final double proporsi;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 70,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.stacked_bar_chart,
-                        color: AppColors.primaryColor,
-                        size: 15,
-                      ),
-                      SizedBox(width: 5),
-                      Text('Pendapatan Per Minggu',
-                          style: TextStyle(
-                              fontFamily: 'Lato',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500)),
-                    ],
-                  ),
-                  Text('Senin - Minggu',
-                      style: TextStyle(
-                          fontFamily: 'Lato',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300))
-                ],
-              ),
-              ListView.separated(
-                  shrinkWrap: true,
-                  separatorBuilder: (context, index) =>
-                      Divider(color: Colors.grey.shade400, height: 24),
-                  itemCount: dataOnWeek.length,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                            dataOnWeek[index]['tgl'] == ''
-                                ? '${dataOnWeek[index]['day']}'
-                                : '${dataOnWeek[index]['day']}, ${dataOnWeek[index]['tgl']}',
-                            style: const TextStyle(
-                              fontFamily: 'Lato',
-                              fontSize: 16,
-                            )),
-                        Text(current.format(dataOnWeek[index]['data']),
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold))
-                      ],
-                    );
-                  })
+              Text(hari,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w600)),
+              if (tanggal.length >= 10)
+                Text(tanggal.substring(0, 10),
+                    style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
         ),
-      ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: proporsi.clamp(0, 1),
+              minHeight: 8,
+              backgroundColor: AppColors.bgGrey,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 100,
+          child: Text(current.format(nilai),
+              textAlign: TextAlign.end,
+              style:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 }

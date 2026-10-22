@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 // Web doesn't read google-services.json, so it needs explicit options.
 const webFirebaseOptions = FirebaseOptions(
@@ -22,6 +24,9 @@ void main() async {
   Env.validate();
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  // sqflite tidak punya implementasi web bawaan; pakai SQLite WASM
+  // (web/sqlite3.wasm & web/sqflite_sw.js dari `dart run sqflite_common_ffi_web:setup`)
+  if (kIsWeb) databaseFactory = databaseFactoryFfiWeb;
   await Firebase.initializeApp(options: kIsWeb ? webFirebaseOptions : null);
   runApp(const MyApp());
 }

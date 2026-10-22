@@ -74,6 +74,9 @@ class _SignUpPageMobileState extends State<SignUpPageMobile> {
                                 children: [
                                   Chip(
                                     backgroundColor: AppColors.primaryColor,
+                                    side: BorderSide.none,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
                                     label: Text(
                                       postApiRegisterO.plan == 'offline'
                                           ? planOffline.nama
@@ -82,8 +85,15 @@ class _SignUpPageMobileState extends State<SignUpPageMobile> {
                                           const TextStyle(color: Colors.white),
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   TextButton(
                                     onPressed: () => Get.back(),
+                                    // Bentuk sama dengan chip paket di sebelahnya
+                                    style: TextButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                    ),
                                     child: const Text('Ganti Paket',
                                         style: TextStyle(
                                             color: AppColors.primaryColor)),

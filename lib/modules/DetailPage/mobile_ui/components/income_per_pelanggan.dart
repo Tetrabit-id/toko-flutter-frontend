@@ -1,74 +1,54 @@
 import 'package:flutter/material.dart';
 
-import '../../../../style/styles.dart';
+import '../../../../routes/state_global.dart';
+import 'detail_card.dart';
 
+// Pendapatan per pelanggan (member) bulan ini, 5 teratas
 class IncomePelangganCard extends StatelessWidget {
-  const IncomePelangganCard({
-    super.key,
-    required this.querySize,
-    required this.dateNow,
-  });
+  const IncomePelangganCard({super.key, required this.dateNow});
 
-  final MediaQueryData querySize;
+  // yyyy-MM
   final String dateNow;
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery(
-      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
-      child: Container(
-        width: querySize.size.width,
-        margin: const EdgeInsets.only(top: 2, left: 2, right: 2, bottom: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [
-            BoxShadow(
-                color: Colors.black26, blurRadius: 3, offset: Offset(0, 0))
-          ],
-          color: Colors.white,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.stacked_bar_chart,
-                        color: AppColors.primaryColor,
-                        size: 15,
-                      ),
-                      SizedBox(width: 5),
-                      Text('Pendapatan Per Pelanggan',
-                          style: TextStyle(
-                              fontFamily: 'Lato',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500)),
-                    ],
+    return DetailCard(
+      icon: Icons.people_alt_rounded,
+      title: 'Pendapatan Per Pelanggan',
+      subtitle: '5 pelanggan teratas · ${labelBulan(dateNow)}',
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: transaksi.getPendapatanPerPelanggan(dateNow),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const LoadingDetail();
+            }
+            var data = (snapshot.data ?? []).take(5).toList();
+            if (data.isEmpty) {
+              return const KosongDetail(
+                icon: Icons.person_outline_rounded,
+                text: 'Belum ada transaksi member bulan ini',
+              );
+            }
+
+            num tertinggi = data.first['total'];
+            return Column(
+              children: [
+                for (var i = 0; i < data.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 14),
+                  BarisPeringkat(
+                    leading: '${data[i]['name']}'.isEmpty
+                        ? '?'
+                        : '${data[i]['name']}'[0].toUpperCase(),
+                    nama: '${data[i]['name']}',
+                    keterangan: '${data[i]['jumlah']} transaksi'
+                        '${data[i]['memberId'] == '' ? '' : ' · ${data[i]['memberId']}'}',
+                    nilai: data[i]['total'],
+                    proporsi: tertinggi == 0 ? 0 : data[i]['total'] / tertinggi,
                   ),
                 ],
-              ),
-              Container(
-                width: double.infinity,
-                height: 60,
-                alignment: Alignment.center,
-                child: const Text(
-                  'Fitur segera tiba!',
-                  style: TextStyle(
-                      fontFamily: 'Lato',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ],
+            );
+          }),
     );
   }
 }

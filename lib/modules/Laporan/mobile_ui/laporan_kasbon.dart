@@ -110,7 +110,7 @@ class InvoiceKasbon extends StatelessWidget {
                             color: AppColors.primaryColor, strokeWidth: 2)),
                   );
                 }
-                List listKasbon = snapshot.data!;
+                List listKasbon = snapshot.data ?? [];
 
                 return Padding(
                     padding: const EdgeInsets.symmetric(

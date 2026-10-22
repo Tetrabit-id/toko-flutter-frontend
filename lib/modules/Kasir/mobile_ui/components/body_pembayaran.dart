@@ -1,5 +1,6 @@
 import 'package:tetrabit_toko_pos/components/add_diskon_popup.dart';
 import 'package:tetrabit_toko_pos/components/select_member_kasir.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,7 +24,52 @@ class BodyPembayaran extends StatefulWidget {
   State<BodyPembayaran> createState() => _BodyPembayaranState();
 }
 
-class _BodyPembayaranState extends State<BodyPembayaran> {
+class _BodyPembayaranState extends State<BodyPembayaran>
+    with SingleTickerProviderStateMixin {
+  final sheetC = DraggableScrollableController();
+  // Panah naik-turun sebagai petunjuk panel bisa digeser ke atas
+  late final petunjukC = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 700),
+  )..repeat(reverse: true);
+  bool tertutup = true;
+
+  double get minSize => (widget.size.height / 1000) * 0.15;
+  static const maxSize = 0.98;
+
+  @override
+  void initState() {
+    super.initState();
+    sheetC.addListener(() {
+      var tutup = sheetC.size < minSize + 0.05;
+      if (tutup != tertutup) setState(() => tertutup = tutup);
+    });
+    // Panel naik sedikit lalu turun lagi saat halaman dibuka
+    WidgetsBinding.instance.addPostFrameCallback((_) => intip());
+  }
+
+  @override
+  void dispose() {
+    petunjukC.dispose();
+    sheetC.dispose();
+    super.dispose();
+  }
+
+  Future<void> intip() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted || !sheetC.isAttached || !tertutup) return;
+    await sheetC.animateTo(minSize + 0.08,
+        duration: const Duration(milliseconds: 350), curve: Curves.easeOut);
+    if (!mounted || !sheetC.isAttached) return;
+    await sheetC.animateTo(minSize,
+        duration: const Duration(milliseconds: 450), curve: Curves.bounceOut);
+  }
+
+  void bukaTutup() {
+    sheetC.animateTo(tertutup ? maxSize : minSize,
+        duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+  }
+
   void addDiscount() async {
     if (kasir.totalPembelian <= 0) {
       return;
@@ -59,11 +105,12 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
   Widget build(BuildContext context) {
     return SizedBox.expand(
       child: DraggableScrollableSheet(
-          initialChildSize: (widget.size.height / 1000) * 0.15,
+          controller: sheetC,
+          initialChildSize: minSize,
           snap: true,
-          snapSizes: [(widget.size.height / 1000) * 0.15, 0.98],
-          minChildSize: (widget.size.height / 1000) * 0.15,
-          maxChildSize: 0.98,
+          snapSizes: [minSize, maxSize],
+          minChildSize: minSize,
+          maxChildSize: maxSize,
           builder: (BuildContext context, scroll) {
             return Container(
               padding: const EdgeInsets.only(top: 12, right: 20, left: 20),
@@ -80,144 +127,186 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20))),
-              child: ListView(
-                controller: scroll,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: widget.size.width / 2.5),
-                    child: Container(
-                      height: 2.5,
-                      decoration: const BoxDecoration(
-                          color: AppColors.borderColor,
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Total Harga Order',
-                          style: TextStyle(color: Colors.black, fontSize: 16)),
-                      StreamBuilder<Object>(
-                          stream: kasir.dataKasir.stream,
-                          builder: (context, snapshot) {
-                            return Text(current.format(kasir.totalPembelian),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold));
-                          }),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  discount(),
-                  line(10),
-                  paymentMethod(),
-                  line(10),
-                  membership(),
-                  line(15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Kembalian',
-                          style: TextStyle(color: Colors.black, fontSize: 16)),
-                      StreamBuilder<Object>(
-                          stream: kasir.dataKasir.stream,
-                          builder: (context, snapshot) {
-                            return Text(current.format(kasir.kembalian),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold));
-                          }),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      StreamBuilder(
-                        stream: kasir.dataKasir.stream,
-                        builder: (context, snapshot) {
-                          return Expanded(
-                              flex: 30,
-                              child: Obx(
-                                () => ElevatedButton.icon(
-                                  label: const Text(
-                                    'Print',
-                                    style: TextStyle(
-                                        fontSize: 16, fontFamily: 'Lato'),
+              // Web/desktop: mouse tidak dihitung sebagai drag secara bawaan,
+              // sehingga panel tidak bisa digeser ke atas dengan mouse
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: PointerDeviceKind.values.toSet(),
+                ),
+                child: ListView(
+                  controller: scroll,
+                  children: [
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: bukaTutup,
+                      child: SizedBox(
+                        height: 24,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: tertutup
+                              ? AnimatedBuilder(
+                                  key: const ValueKey('petunjuk'),
+                                  animation: petunjukC,
+                                  builder: (context, child) =>
+                                      Transform.translate(
+                                    offset: Offset(
+                                        0,
+                                        4 -
+                                            6 *
+                                                Curves.easeInOut.transform(
+                                                    petunjukC.value)),
+                                    child: child,
                                   ),
-                                  icon: const Icon(Icons.print_outlined),
-                                  onPressed: kasir.open.value != true
-                                      ? null
-                                      : () {
-                                          printer.printDataKasir(
-                                            kasir.dataKasir,
-                                            widget.dataNmKry,
-                                            widget.dataNmToko,
-                                            kasir,
-                                          );
-                                          printer.printer.isConnected
-                                              .then((isConneted) {
-                                            if (isConneted != true) {
-                                              return;
-                                            }
-                                            kasir.transaksi();
-                                          });
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                      fixedSize: const Size(130, 0),
-                                      backgroundColor: kasir.open.value != true
-                                          ? Colors.grey
-                                          : AppColors.secondaryColor,
-                                      shape: const RoundedRectangleBorder(
+                                  child: const Icon(
+                                    Icons.keyboard_arrow_up_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 26,
+                                  ),
+                                )
+                              : Center(
+                                  key: const ValueKey('pegangan'),
+                                  child: Container(
+                                    width: 40,
+                                    height: 4,
+                                    decoration: const BoxDecoration(
+                                        color: AppColors.borderColor,
                                         borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                      )),
-                                ),
-                              ));
-                        },
-                      ),
-                      Expanded(
-                        flex: 70,
-                        child: SizedBox(
-                          height: 50,
-                          child: Obx(
-                            () => GestureDetector(
-                              onTap: () => saveTransaksi(),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.save_as,
-                                    color: kasir.open.value != true
-                                        ? Colors.grey
-                                        : Colors.black87,
-                                    size: 20,
+                                            Radius.circular(20))),
                                   ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    'Simpan',
-                                    style: TextStyle(
-                                      fontSize: 18,
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Total Harga Order',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                        StreamBuilder<Object>(
+                            stream: kasir.dataKasir.stream,
+                            builder: (context, snapshot) {
+                              return Text(current.format(kasir.totalPembelian),
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold));
+                            }),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    discount(),
+                    line(10),
+                    paymentMethod(),
+                    line(10),
+                    membership(),
+                    line(15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Kembalian',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                        StreamBuilder<Object>(
+                            stream: kasir.dataKasir.stream,
+                            builder: (context, snapshot) {
+                              return Text(current.format(kasir.kembalian),
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold));
+                            }),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        StreamBuilder(
+                          stream: kasir.dataKasir.stream,
+                          builder: (context, snapshot) {
+                            return Expanded(
+                                flex: 30,
+                                child: Obx(
+                                  () => ElevatedButton.icon(
+                                    label: const Text(
+                                      'Print',
+                                      style: TextStyle(
+                                          fontSize: 16, fontFamily: 'Lato'),
+                                    ),
+                                    icon: const Icon(Icons.print_outlined),
+                                    onPressed: kasir.open.value != true
+                                        ? null
+                                        : () {
+                                            printer.printDataKasir(
+                                              kasir.dataKasir,
+                                              widget.dataNmKry,
+                                              widget.dataNmToko,
+                                              kasir,
+                                            );
+                                            printer.printer.isConnected
+                                                .then((isConneted) {
+                                              if (isConneted != true) {
+                                                return;
+                                              }
+                                              kasir.transaksi();
+                                            });
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        fixedSize: const Size(130, 0),
+                                        backgroundColor:
+                                            kasir.open.value != true
+                                                ? Colors.grey
+                                                : AppColors.secondaryColor,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8)),
+                                        )),
+                                  ),
+                                ));
+                          },
+                        ),
+                        Expanded(
+                          flex: 70,
+                          child: SizedBox(
+                            height: 50,
+                            child: Obx(
+                              () => GestureDetector(
+                                onTap: () => saveTransaksi(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.save_as,
                                       color: kasir.open.value != true
                                           ? Colors.grey
                                           : Colors.black87,
-                                      fontWeight: FontWeight.w500,
+                                      size: 20,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      'Simpan',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: kasir.open.value != true
+                                            ? Colors.grey
+                                            : Colors.black87,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10)
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 10)
+                  ],
+                ),
               ),
             );
           }),
@@ -251,6 +340,7 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                     }
                   : null,
               style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
                 fixedSize: Size(widget.size.width, 38),
                 backgroundColor: pelanggan.foundPelangganId.isFalse
                     ? Colors.grey
@@ -384,7 +474,8 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
             onPressed:
                 !kasir.discountChecked.value ? () => addDiscount() : null,
             style: ElevatedButton.styleFrom(
-                fixedSize: const Size(100, 0),
+                // Tanpa lebar tetap: 100px tidak cukup untuk ikon + teks
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 0,
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -395,6 +486,7 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                   borderRadius: const BorderRadius.all(Radius.circular(5)),
                 )),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -449,6 +541,7 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                             ? () => kasir.bayar()
                             : null,
                         style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
                             fixedSize: Size(widget.size.width, 42),
                             shadowColor: Colors.transparent,
                             backgroundColor: kasir.checkBayar.value &&
@@ -510,15 +603,17 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                     return Obx(
                       () => ElevatedButton(
                           // Paket offline: tunai saja, tanpa payment gateway
-                          onPressed: paket.canPaymentGateway &&
-                                  kasbon.kasbonActive.isFalse &&
+                          // Nilai Rx dibaca duluan: Obx error jika tidak ada Rx yang dibaca
+                          onPressed: kasbon.kasbonActive.isFalse &&
+                                  paket.canPaymentGateway &&
                                   kasir.totalPembelian > 0
                               ? () => kasir.bayarOnline()
                               : null,
                           style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
                               fixedSize: Size((widget.size.width / 2) - 24, 38),
-                              backgroundColor: paket.canPaymentGateway &&
-                                      kasir.checkBayar.value &&
+                              backgroundColor: kasir.checkBayar.value &&
+                                      paket.canPaymentGateway &&
                                       kasir.totalPembelian > 0
                                   ? AppColors.primaryColor
                                   : Colors.grey,
@@ -549,6 +644,7 @@ class _BodyPembayaranState extends State<BodyPembayaran> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
                             fixedSize: Size((widget.size.width / 2) - 24, 38),
                             shadowColor: Colors.transparent,
                             backgroundColor: kasir.checkBayar.value &&

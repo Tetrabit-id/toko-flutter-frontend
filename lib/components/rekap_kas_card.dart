@@ -107,6 +107,7 @@ class RekapKasCard extends StatelessWidget {
                   flex: 65,
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
                         backgroundColor: Colors.red,
                       ),
                       onPressed: () => tutupBuku(index),

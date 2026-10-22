@@ -630,15 +630,16 @@ class _KasirPageforTabletState extends State<KasirPageforTablet> {
                     return Obx(
                       () => ElevatedButton(
                           // Paket offline: tunai saja, tanpa payment gateway
-                          onPressed: paket.canPaymentGateway &&
-                                  kasbon.kasbonActive.isFalse &&
+                          // Nilai Rx dibaca duluan: Obx error jika tidak ada Rx yang dibaca
+                          onPressed: kasbon.kasbonActive.isFalse &&
+                                  paket.canPaymentGateway &&
                                   kasir.totalPembelian > 0
                               ? () => kasir.bayarOnline()
                               : null,
                           style: ElevatedButton.styleFrom(
                               fixedSize: Size((size.width / 6) - 20, 38),
-                              backgroundColor: paket.canPaymentGateway &&
-                                      kasir.checkBayar.value &&
+                              backgroundColor: kasir.checkBayar.value &&
+                                      paket.canPaymentGateway &&
                                       kasir.totalPembelian > 0
                                   ? AppColors.primaryColor
                                   : Colors.grey,

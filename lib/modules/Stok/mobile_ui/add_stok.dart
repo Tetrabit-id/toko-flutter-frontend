@@ -8,10 +8,12 @@ import 'package:tetrabit_toko_pos/models/merk.dart';
 import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
 import 'package:get/get.dart';
 import '../../../components/add_merk_produk_popup.dart';
+import '../../../components/pilih_atribut_field.dart';
 import '../../../routes/state_global.dart';
 
 class AddStokPage extends StatefulWidget {
@@ -23,6 +25,14 @@ class AddStokPage extends StatefulWidget {
 
 class _AddStokPageState extends State<AddStokPage> {
   String? scannerQr = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Halaman ini bisa dibuka dari Beranda tanpa memuat kategori & merk dulu
+    getApiKategoriProduk.getApi();
+    getApiMerkProduk.getApi();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +99,13 @@ class _AddStokPageState extends State<AddStokPage> {
                                     width: querySize.size.width / 1.7,
                                     height: querySize.size.width / 1.7,
                                     child: CircleAvatar(
-                                        backgroundImage: Image.file(
-                                                File(picker.imagePath!.value))
-                                            .image)),
+                                        // Web: path berupa blob URL
+                                        backgroundImage: kIsWeb
+                                            ? NetworkImage(
+                                                picker.imagePath!.value)
+                                            : FileImage(File(
+                                                    picker.imagePath!.value))
+                                                as ImageProvider)),
                                 ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                         elevation: 0,
@@ -299,7 +313,7 @@ class _AddStokPageState extends State<AddStokPage> {
                 ),
               ),
             ),
-            Expanded(flex: 60, child: dropDownKategori(size)),
+            Expanded(flex: 60, child: dropDownKategori(addKategoriProduk)),
           ],
         ),
         const SizedBox(height: 24),
@@ -315,7 +329,7 @@ class _AddStokPageState extends State<AddStokPage> {
                 ),
               ),
             ),
-            Expanded(flex: 60, child: dropDownMerk(size)),
+            Expanded(flex: 60, child: dropDownMerk(addMerkProduk)),
           ],
         ),
       ],
@@ -347,86 +361,30 @@ class _AddStokPageState extends State<AddStokPage> {
     );
   }
 
-  DropdownSearch<Kategori> dropDownKategori(Size size) {
-    return DropdownSearch<Kategori>(
-      dropdownBuilder: (context, selectedItem) => Text(
-        selectedItem?.name.toString() ?? "Pilih Kategori Produk",
-        style: TextStyle(
-          fontSize: 15,
-          color: selectedItem?.name.toString() != null
-              ? Colors.black
-              : const Color.fromARGB(156, 0, 0, 0),
-        ),
-      ),
-      onChanged: (value) {
-        setState(() {
-          stok.kategoriIdPrdC = value?.id ?? '';
-        });
-      },
-      dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration: InputDecoration(
-          labelStyle: const TextStyle(color: Colors.black),
-          contentPadding: EdgeInsets.symmetric(horizontal: size.width / 20),
-          border: const OutlineInputBorder(),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
-          labelText: "Pilih Kategori",
-          filled: true,
-        ),
-      ),
-      clearButtonProps: const ClearButtonProps(isVisible: true),
-      items: getApiKategoriProduk.dataKategoriProduk.toList(),
-      popupProps: PopupProps.bottomSheet(
-        showSearchBox: true,
-        itemBuilder: (context, item, isSelected) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: ListTile(
-            title: Text('${item.name}'),
-          ),
-        ),
-      ),
+  PilihAtributField<Kategori> dropDownKategori(
+      Future<void> Function() addKategori) {
+    return PilihAtributField<Kategori>(
+      label: 'Kategori',
+      items: getApiKategoriProduk.dataKategoriProduk,
+      idOf: (item) => item.id,
+      nameOf: (item) => item.name,
+      selectedId: stok.kategoriIdPrdC,
+      onChanged: (id) => setState(() => stok.kategoriIdPrdC = id),
+      onAdd: addKategori,
+      onDelete: (item) => getApiKategoriProduk.delete(item.id),
     );
   }
 
-  DropdownSearch<Merk> dropDownMerk(Size size) {
-    return DropdownSearch<Merk>(
-      dropdownBuilder: (context, selectedItem) => Text(
-        selectedItem?.name.toString() ?? "Pilih Merk Produk",
-        style: TextStyle(
-          fontSize: 15,
-          color: selectedItem?.name.toString() != null
-              ? Colors.black
-              : const Color.fromARGB(156, 0, 0, 0),
-        ),
-      ),
-      onChanged: (value) {
-        setState(() {
-          stok.merkIdPrdC = value?.id ?? '';
-        });
-      },
-      dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration: InputDecoration(
-          labelStyle: const TextStyle(color: Colors.black),
-          contentPadding: EdgeInsets.symmetric(horizontal: size.width / 20),
-          border: const OutlineInputBorder(),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
-          labelText: "Pilih Merk",
-          filled: true,
-        ),
-      ),
-      clearButtonProps: const ClearButtonProps(isVisible: true),
-      items: getApiMerkProduk.dataMerkProduk.toList(),
-      popupProps: PopupProps.modalBottomSheet(
-        itemBuilder: (context, item, isSelected) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: ListTile(
-            title: Text('${item.name}'),
-          ),
-        ),
-      ),
+  PilihAtributField<Merk> dropDownMerk(Future<void> Function() addMerk) {
+    return PilihAtributField<Merk>(
+      label: 'Merk',
+      items: getApiMerkProduk.dataMerkProduk,
+      idOf: (item) => item.id,
+      nameOf: (item) => item.name,
+      selectedId: stok.merkIdPrdC,
+      onChanged: (id) => setState(() => stok.merkIdPrdC = id),
+      onAdd: addMerk,
+      onDelete: (item) => getApiMerkProduk.delete(item.id),
     );
   }
 }

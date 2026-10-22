@@ -112,13 +112,14 @@ class _PelangganPageState extends State<PelangganPage> {
             padding: const EdgeInsets.only(right: 15),
             onPressed: () => Get.toNamed(RouteName.addPelanggan),
             icon: Container(
-              width: 100,
-              height: 32,
+              width: 36,
+              height: 36,
               decoration: const BoxDecoration(
                   color: Color.fromRGBO(46, 44, 44, 1),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
               child: const Icon(
                 Icons.add,
+                color: Colors.white,
               ),
             ))
       ],

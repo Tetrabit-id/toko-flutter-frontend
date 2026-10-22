@@ -20,8 +20,9 @@ class InsertTransaksiAPI extends GetxController {
     num subJumlahTransaksi,
     num jumlahPembayaran,
     num jumlahTransaksi,
-    num kembalian,
-  ) async {
+    num kembalian, {
+    String? membershipsId,
+  }) async {
     try {
       var response = await http.post(
         Uri.parse('$baseUrl/transaksi'),
@@ -38,6 +39,8 @@ class InsertTransaksiAPI extends GetxController {
           'jumlahPembayaran': jumlahPembayaran,
           'jumlahTransaksi': jumlahTransaksi,
           'kembalian': kembalian,
+          // Untuk laporan pendapatan per pelanggan
+          if (membershipsId != null) 'membershipsId': membershipsId,
         }),
         headers: {'Authorization': 'Bearer ${token.read('token')}'},
       );
