@@ -1,5 +1,5 @@
-import 'package:diatera_pos/modules/FirstPage/mobile_ui/welcomepage.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/modules/FirstPage/mobile_ui/welcomepage.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/cupertino.dart';
 
 class StartPage extends StatefulWidget {

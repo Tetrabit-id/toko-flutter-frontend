@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:diatera_pos/models/user_owner.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/models/user_owner.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -76,6 +76,7 @@ class AuthController extends GetxController {
     await token.write('email', user!.email);
     await token.write('name', user!.name);
     await token.write('owner', user!.owner);
+    await token.write('plan', user!.plan);
     update();
 
     // clear field email & pw
@@ -83,9 +84,7 @@ class AuthController extends GetxController {
     passwordLogC.clear();
     checkedLogin = false;
 
-    Get.offAndToNamed(user!.statusPembayaran == false
-        ? RouteName.paymentInfoForOwner
-        : RouteName.index);
+    routeOwner(user!.plan, user!.statusPembayaran);
   } // end login
 
   // Login or Register for Owner by Google
@@ -105,21 +104,30 @@ class AuthController extends GetxController {
     await token.write('email', user!.email);
     await token.write('name', user!.name);
     await token.write('owner', user!.owner);
+    await token.write('plan', user!.plan);
     update();
 
     if (user!.store!.isEmpty == true) {
       return Get.offAndToNamed(RouteName.firstAddToko);
     }
 
-    Get.offAndToNamed(user!.statusPembayaran == false
-        ? RouteName.paymentInfoForOwner
-        : RouteName.index);
+    routeOwner(user!.plan, user!.statusPembayaran);
   } // end login
 
   //Login for karyawan
   Future loginKaryawan(String email, String password) async {
     userByToken = await postApiLoginK.connectAPI(email, password);
     if (userByToken?.token == null) {
+      update();
+      return;
+    }
+
+    // Paket offline tidak punya karyawan
+    if (userByToken?.plan == 'offline') {
+      snackbarNotif.unsuccess(
+        'Login karyawan tidak tersedia',
+        'Toko ini memakai paket offline, silakan login sebagai owner',
+      );
       update();
       return;
     }
@@ -167,11 +175,37 @@ class AuthController extends GetxController {
 
   // Remember me and select page route
   autoLogin() async {
+    // Paket offline: lisensi valid milik akun ini cukup untuk masuk tanpa internet
     if (token.hasData('token') == true) {
+      var license = await lisensi.getValidLicense();
+      if (license != null && license.userId == token.read('_id')) {
+        await token.write('plan', 'offline');
+        lisensi.checkRevoked(license);
+        return Get.offAllNamed(RouteName.index);
+      }
+    }
+
+    if (token.hasData('token') == true) {
+      // Subscription tanpa koneksi: masuk dengan sesi terakhir, kasir tetap
+      // jalan dan transaksi dikirim saat online
+      if (token.read('plan') != 'offline' && !await koneksi.check()) {
+        sinkron.refreshCount();
+        var role = token.read('role');
+        return Get.offAllNamed(role == 'admin'
+            ? RouteName.index
+            : role == 'Kasir'
+                ? RouteName.indexKasir
+                : RouteName.indexGudang);
+      }
+
       userByToken = await checkApiToken.connectAPI(
         token.read('token'),
         token.read('_id'),
       );
+      if (userByToken?.plan != null) {
+        await token.write('plan', userByToken!.plan);
+      }
+      sinkron.trigger();
 
       // AutoLog selain role admin
       if (userByToken?.role != 'admin') {
@@ -195,11 +229,26 @@ class AuthController extends GetxController {
       }
 
       // AutoLog role admin
-      return userByToken?.statusPembayaran == false
-          ? Get.offAndToNamed(RouteName.paymentInfoForOwner)
-          : Get.offAndToNamed(RouteName.index);
+      return routeOwner(userByToken?.plan, userByToken?.statusPembayaran);
     }
   } // end autologin
+
+  // Tujuan owner setelah login sesuai paket
+  Future routeOwner(String? plan, bool? statusPembayaran) async {
+    // Offline: aktif jika HP ini punya lisensi valid milik akun ini
+    if (plan == 'offline') {
+      var license = await lisensi.getValidLicense();
+      return Get.offAllNamed(
+          license != null && license.userId == token.read('_id')
+              ? RouteName.index
+              : RouteName.aktivasi);
+    }
+
+    // Subscription: aktif jika sudah dikonfirmasi admin
+    return Get.offAndToNamed(statusPembayaran == false
+        ? RouteName.paymentInfoForOwner
+        : RouteName.index);
+  }
 
   // Tombol untuk update pass google for basis & update nama toko
   Future<void> addEmptybyLoginGoogle(String toko, String pass) async {
@@ -237,31 +286,40 @@ class AuthController extends GetxController {
 
     // Register Success
     // check pembayaran role admin
-    return userByToken?.statusPembayaran == false
-        ? Get.offAndToNamed(RouteName.paymentInfoForOwner)
-        : Get.offAndToNamed(RouteName.index);
+    return routeOwner(token.read('plan'),
+        userByToken?.statusPembayaran ?? user?.statusPembayaran);
+  }
+
+  //Penghapusan Storage Local
+  // Lisensi offline sengaja tidak dihapus, agar login ulang di HP yang sama
+  // tidak perlu kode aktivasi baru.
+  void clearSession() {
+    token.remove('token');
+    token.remove('_id');
+    token.remove('cabangId');
+    token.remove('role');
+    token.remove('parent');
+    token.remove('parentId');
+    token.remove('store');
+    token.remove('email');
+    token.remove('name');
+    token.remove('owner');
+    token.remove('plan');
   }
 
   // Tombol Logout
   void logout() async {
     await token.read('token');
+    await sinkron.refreshCount();
     Get.defaultDialog(
-      middleText: 'Yakin, keluar Toko?',
+      middleText: sinkron.pending.value > 0
+          ? 'Masih ada ${sinkron.pending.value} data yang belum terkirim. Data tetap tersimpan di HP ini dan dikirim saat kamu login lagi.\n\nYakin, keluar Toko?'
+          : 'Yakin, keluar Toko?',
       title: 'Logout Akun',
       titlePadding: const EdgeInsets.only(top: 15),
       contentPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
       onConfirm: () async {
-        //Penghapusan Storage Local
-        token.remove('token');
-        token.remove('_id');
-        token.remove('cabangId');
-        token.remove('role');
-        token.remove('parent');
-        token.remove('parentId');
-        token.remove('store');
-        token.remove('email');
-        token.remove('name');
-        token.remove('owner');
+        clearSession();
 
         // menuju ;
         Get.offAllNamed(RouteName.firstPageMobile);
@@ -283,14 +341,20 @@ class AuthController extends GetxController {
 
   // Tombol Menampilkan PopUp Edit Akun
   void editAkun() async {
-    userByToken = await checkApiToken.connectAPI(
-      token.read('token'),
-      token.read('_id'),
-    );
+    if (paket.isOffline) {
+      // Paket offline: isi dari sesi lokal, tidak perlu internet
+      editUsernameC.text = token.read('name') ?? '';
+      editTokoC.text = token.read('store') ?? '';
+    } else {
+      userByToken = await checkApiToken.connectAPI(
+        token.read('token'),
+        token.read('_id'),
+      );
 
-    // Input data to PopUpAkun
-    editUsernameC.text = userByToken!.name.toString();
-    editTokoC.text = userByToken!.store.toString();
+      // Input data to PopUpAkun
+      editUsernameC.text = userByToken!.name.toString();
+      editTokoC.text = userByToken!.store.toString();
+    }
 
     Get.defaultDialog(
       title: 'Edit Akun',

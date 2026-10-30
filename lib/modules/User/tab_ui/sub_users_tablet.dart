@@ -1,7 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:diatera_pos/components/user_card.dart';
+import 'package:tetrabit_toko_pos/components/user_card.dart';
 
 import '../../../components/loading_cilcular.dart';
 import '../../../constructors/button_primary.dart';

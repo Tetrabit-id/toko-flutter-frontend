@@ -3,8 +3,8 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:http/http.dart' as http;
 
 class InsertPesananAPI extends GetxController {

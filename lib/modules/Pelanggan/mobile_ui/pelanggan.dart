@@ -1,4 +1,4 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
+import 'package:tetrabit_toko_pos/components/loading_cilcular.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +53,7 @@ class _PelangganPageState extends State<PelangganPage> {
     final querySize = MediaQuery.of(context);
     TextEditingController searchC = TextEditingController();
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: headerPelangganPage(querySize.size, searchC),
@@ -112,13 +112,14 @@ class _PelangganPageState extends State<PelangganPage> {
             padding: const EdgeInsets.only(right: 15),
             onPressed: () => Get.toNamed(RouteName.addPelanggan),
             icon: Container(
-              width: 100,
-              height: 32,
+              width: 36,
+              height: 36,
               decoration: const BoxDecoration(
                   color: Color.fromRGBO(46, 44, 44, 1),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
               child: const Icon(
                 Icons.add,
+                color: Colors.white,
               ),
             ))
       ],

@@ -12,6 +12,14 @@ class GetPesananByInvAPI extends GetxController {
 
   // Function Get Data Pesanan
   Future<List> getApi(String noInv) async {
+    // Paket offline, subscription tanpa koneksi, atau transaksi yang belum
+    // terkirim: dari DB lokal (bentuk sama: [daftar item pesanan])
+    var pesananLokal = await localTransaksi.getPesananByInvoice(noInv);
+    if (paket.isOffline || koneksi.terputus || pesananLokal.isNotEmpty) {
+      dataPesanan.assignAll([pesananLokal]);
+      return dataPesanan;
+    }
+
     var invBase64 = base64Url.encode(utf8.encode(noInv));
     try {
       var response = await http.get(

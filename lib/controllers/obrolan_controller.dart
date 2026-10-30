@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
 import 'dart:convert';
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/io.dart';

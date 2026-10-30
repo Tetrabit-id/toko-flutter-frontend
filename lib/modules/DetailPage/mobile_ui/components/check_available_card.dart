@@ -4,150 +4,98 @@ import '../../../../routes/base_url.dart';
 import '../../../../routes/state_global.dart';
 
 class CheckAvailableCard extends StatelessWidget {
-  const CheckAvailableCard({
-    super.key,
-    required this.data,
-    required this.querySize,
-  });
+  const CheckAvailableCard({super.key, required this.data});
 
   final List data;
-  final MediaQueryData querySize;
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Row(
+      children: [
+        Expanded(
+          child: _Statistik(
+            icon: Icons.receipt_long_rounded,
+            color: const Color.fromARGB(255, 7, 133, 223),
+            label: 'Transaksi',
+            jumlah: Future.value(data),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _Statistik(
+            icon: Icons.remove_shopping_cart_rounded,
+            color: const Color.fromARGB(255, 240, 60, 90),
+            label: 'Stok Habis',
+            jumlah: stok.getOutStok(token.read('_id'), token.read('cabangId')),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _Statistik(
+            icon: Icons.inventory_2_rounded,
+            color: const Color.fromARGB(255, 5, 150, 29),
+            label: 'Stok Tersedia',
+            jumlah: stok.getAvailableStok(
+                token.read('_id'), token.read('cabangId')),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Statistik extends StatelessWidget {
+  const _Statistik({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.jumlah,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+  final Future<List> jumlah;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          transaksiBerhasilCard(),
-          stokHabisCard(),
-          stokTersediaCard(),
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(height: 12),
+          FutureBuilder<List>(
+            future: jumlah,
+            builder: (context, snapshot) => Text(
+              snapshot.hasData ? '${snapshot.data!.length}' : '-',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: 'Lato',
+                fontSize: 12,
+                color: Colors.black54,
+              )),
         ],
       ),
     );
-  }
-
-  Container stokTersediaCard() {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 64, 223, 7),
-            Color.fromARGB(255, 5, 135, 29)
-          ],
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-        ),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: FutureBuilder<List>(
-        future:
-            stok.getAvailableStok(token.read('_id'), token.read('cabangId')),
-        initialData: stok.availableStok,
-        builder: (context, snapshot) {
-          var dataStokAv = stok.availableStok;
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(dataStokAv.isEmpty ? '0' : dataStokAv.length.toString(),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 5),
-              const Text('Stok Tersedia',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Lato',
-                    fontSize: 12,
-                  )),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Container stokHabisCard() {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 250, 54, 119),
-            Color.fromARGB(255, 252, 78, 78)
-          ],
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: FutureBuilder<List?>(
-        future: stok.getOutStok(token.read('_id'), token.read('cabangId')),
-        initialData: stok.outStok,
-        builder: (context, snapshot) {
-          var dataStok = stok.outStok;
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(dataStok.isEmpty ? '0' : dataStok.length.toString(),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 5),
-              const Text('Stok Habis',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Lato',
-                    fontSize: 12,
-                  )),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Container transaksiBerhasilCard() {
-    return Container(
-        width: 80,
-        height: 80,
-        padding: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color.fromARGB(255, 7, 133, 223),
-              Color.fromARGB(255, 16, 195, 235)
-            ],
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-          ),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(data.isEmpty ? '0' : data.length.toString(),
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
-            const Text('Transaksi Berhasil',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Lato',
-                  fontSize: 12,
-                )),
-          ],
-        ));
   }
 }

@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +14,23 @@ class InsertRekapKasAPI extends GetxController {
     String cabangId,
     int kasAwal,
   ) async {
+    // Paket offline: disimpan lokal
+    // Subscription tanpa koneksi: disimpan di HP, dikirim saat online
+    if (paket.isOffline || koneksi.terputus) {
+      await localRekapKas.insertRekapKas(kasAwal,
+          pending: !paket.isOffline, cabangId: cabangId);
+      if (paket.isOffline) {
+        snackbarNotif.success('Success', 'Rekap kas telah ditambahkan');
+      } else {
+        snackbarNotif.success('Tersimpan di HP',
+            'Tidak ada koneksi, rekap kas dikirim otomatis saat online');
+        sinkron.refreshCount();
+      }
+      rekapKas.kasAwalNewRekapC.clear();
+      rekapKas.cabangIdRekapC = '';
+      return;
+    }
+
     try {
       var response = await http
           .post(Uri.parse('$baseUrl/rekap-kas/$userId/get-by-owner/insert'),

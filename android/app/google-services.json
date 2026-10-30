@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "376454710278",
-    "project_id": "diatera-pos",
-    "storage_bucket": "diatera-pos.appspot.com"
+    "project_number": "806746640310",
+    "project_id": "toko-pos-2cda9",
+    "storage_bucket": "toko-pos-2cda9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:376454710278:android:e6ca696e8141cf188caf87",
+        "mobilesdk_app_id": "1:806746640310:android:9ca3b84439e27f4de8fb17",
         "android_client_info": {
-          "package_name": "com.example.diatera_pos"
+          "package_name": "com.example.tetrabit_toko_pos"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "376454710278-ldkfeqjc9c74j1m0jqa3rjh7tle902vj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.diatera_pos",
-            "certificate_hash": "12aaf3579fb408d94ae28386992932316c4f50e5"
-          }
-        },
-        {
-          "client_id": "376454710278-92jlbauekqj26n35p2ovfvsccp298u79.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA9P8Uy5fzUIp8ZsYxMAu7ukFlFs3p9Mx0"
+          "current_key": "AIzaSyB6Bi_7mVOvLwtupYv8Q-G7A0bb0oHeiBU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "376454710278-0jlgc8179q2fnnq8v8t2j7v0i39cnjio.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

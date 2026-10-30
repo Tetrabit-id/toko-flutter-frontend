@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../../models/cabang.dart';
 import '../../routes/base_url.dart';
+import '../../routes/state_global.dart';
 
 class GetCabangAPI extends GetxController {
   final dataCabangOwner = List<Cabang>.empty().obs;
@@ -24,6 +25,15 @@ class GetCabangAPI extends GetxController {
 
   // Function Get Data Cabang
   Future<List> getAPI() async {
+    // Paket offline hanya punya cabang Pusat
+    if (paket.isOffline) {
+      dataCabangOwner.assignAll([Cabang(id: localDb.cabangId, name: 'Pusat')]);
+      return dataCabangOwner;
+    }
+
+    // Subscription tanpa koneksi: daftar cabang terakhir
+    if (koneksi.terputus) return _fromCache();
+
     var idOwner = token.read('_id');
     try {
       var response = await http.get(
@@ -55,6 +65,7 @@ class GetCabangAPI extends GetxController {
       }
 
       List cabangData = (data as Map<String, dynamic>)['data'];
+      await token.write('cacheCabang', cabangData);
 
       for (var e in cabangData) {
         dataCabangOwner.add(Cabang(
@@ -67,7 +78,18 @@ class GetCabangAPI extends GetxController {
       return dataCabangOwner;
     } catch (e) {
       print(e);
+      return _fromCache();
     }
+  }
+
+  List _fromCache() {
+    List cabangData = token.read('cacheCabang') ?? [];
+    dataCabangOwner.assignAll(cabangData.map((e) => Cabang(
+          id: e['_id'],
+          name: e['name'],
+          alamat: e['alamat'],
+          noTelp: e['noTelponAdmin'],
+        )));
     return dataCabangOwner;
   }
 }

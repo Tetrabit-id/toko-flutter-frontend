@@ -110,7 +110,7 @@ class InvoiceLaporan extends StatelessWidget {
                             color: AppColors.primaryColor, strokeWidth: 2)),
                   );
                 }
-                List listInvoice = snapshot.data!;
+                List listInvoice = snapshot.data ?? [];
 
                 return Padding(
                     padding: const EdgeInsets.symmetric(

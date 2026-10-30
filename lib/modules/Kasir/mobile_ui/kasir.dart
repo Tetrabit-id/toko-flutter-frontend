@@ -1,6 +1,6 @@
-import 'package:diatera_pos/components/filter_stok_kasir.dart';
-import 'package:diatera_pos/constructors/button_primary.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/components/filter_stok_kasir.dart';
+import 'package:tetrabit_toko_pos/constructors/button_primary.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +28,7 @@ class _KasirPageState extends State<KasirPage> {
   Widget build(BuildContext context) {
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: headerKasirPage(querySize.size, context),

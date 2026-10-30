@@ -27,9 +27,17 @@ import '../modules/Navbar/role_gudang/index_gudang.dart';
 import '../modules/Pelanggan/mobile_ui/add_pelanggan.dart';
 import '../modules/User/mobile_ui/add_user.dart';
 import '../modules/User/mobile_ui/sub_users.dart';
+import '../modules/Register/mobile_ui/choose_plan.dart';
+import '../modules/Aktivasi/mobile_ui/aktivasi_kode.dart';
+import '../modules/Backup/mobile_ui/backup_page.dart';
+import 'plan_middleware.dart';
+import 'state_global.dart';
 
 abstract class RouteName {
   static const start = '/';
+  static const aktivasi = '/mobile/aktivasi';
+  static const backup = '/index/backup';
+  static const choosePlan = '/mobile/choose_plan';
   static const addStok = '/mobile/add_stok';
   static const addCabang = '/mobile/add_cabang';
   static const addUser = '/mobile/add_user';
@@ -62,9 +70,21 @@ abstract class RouteName {
 class AppPages {
   static final pages = [
     GetPage(name: RouteName.start, page: () => const StartPage()),
-    GetPage(name: RouteName.addCabang, page: () => const AddCabangPage()),
+    GetPage(name: RouteName.aktivasi, page: () => const AktivasiKodePage()),
+    GetPage(
+        name: RouteName.backup,
+        page: () => const BackupPage(),
+        middlewares: [PlanMiddleware(() => paket.isOffline)]),
+    GetPage(name: RouteName.choosePlan, page: () => const ChoosePlanPage()),
+    GetPage(
+        name: RouteName.addCabang,
+        page: () => const AddCabangPage(),
+        middlewares: [PlanMiddleware(() => paket.canMultiCabang)]),
     GetPage(name: RouteName.addStok, page: () => const AddStokPage()),
-    GetPage(name: RouteName.addUser, page: () => const AddUserPage()),
+    GetPage(
+        name: RouteName.addUser,
+        page: () => const AddUserPage(),
+        middlewares: [PlanMiddleware(() => paket.canKelolaKaryawan)]),
     GetPage(name: RouteName.addPelanggan, page: () => const AddPelangganPage()),
     GetPage(name: RouteName.addRekapKas, page: () => const AddRekapKasPage()),
     GetPage(name: RouteName.detail, page: () => const DetailPage()),
@@ -80,8 +100,14 @@ class AppPages {
     GetPage(name: RouteName.indexGudang, page: () => const IndexGudangPage()),
     GetPage(name: RouteName.laporan, page: () => const LaporanPage()),
     GetPage(name: RouteName.loginMobile, page: () => const LoginPageMobile()),
-    GetPage(name: RouteName.obrolan, page: () => const ObrolanPage()),
-    GetPage(name: RouteName.pesan, page: () => const PesanPage()),
+    GetPage(
+        name: RouteName.obrolan,
+        page: () => const ObrolanPage(),
+        middlewares: [PlanMiddleware(() => paket.canChat)]),
+    GetPage(
+        name: RouteName.pesan,
+        page: () => const PesanPage(),
+        middlewares: [PlanMiddleware(() => paket.canChat)]),
     GetPage(
         name: RouteName.paymentDetail, page: () => const PaymentDetailPage()),
     GetPage(
@@ -94,7 +120,10 @@ class AppPages {
     GetPage(name: RouteName.rekapKas, page: () => const RekapKasPage()),
     GetPage(name: RouteName.signUpMobile, page: () => const SignUpPageMobile()),
     GetPage(name: RouteName.stok, page: () => const StokPage()),
-    GetPage(name: RouteName.user, page: () => const SubUserPage()),
+    GetPage(
+        name: RouteName.user,
+        page: () => const SubUserPage(),
+        middlewares: [PlanMiddleware(() => paket.canKelolaKaryawan)]),
     GetPage(name: RouteName.nfc, page: () => const NFCReader()),
   ];
 }

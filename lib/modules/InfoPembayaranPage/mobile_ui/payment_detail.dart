@@ -1,10 +1,13 @@
-import 'package:diatera_pos/constructors/button_primary.dart';
+import 'package:tetrabit_toko_pos/constructors/button_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/env.dart';
+import '../../../routes/base_url.dart';
+import '../../../routes/state_global.dart';
 import '../../../style/styles.dart';
 
 class PaymentDetailPage extends StatelessWidget {
@@ -12,22 +15,25 @@ class PaymentDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final info = paket.info;
     List dataText = [
       '1. Lakukan Transfer Bank dengan no.rek diatas.',
       '2. Setelah itu Screenshot/Foto bukti transfermu dan kirimkan dengan menekan tombol "Kirim Bukti Transfer" dibawah.',
       '3. Jika kamu "Pengguna Baru" mohon menekan tombol "Pengguna Baru", isi format yang telah disediakan sesuai data yang kamu registrasikan dalam aplikasi Toko dan kirimkan beserta bukti transfermu.',
       '4. Admin kami akan mengecek pembayaranmu dalam kurun waktu max.15 menit',
-      '5. Jika telah dikonfirmasi, Admin akan memberikan waktu penggunaan aplikasi kepadamu dan aplikasi Toko-mu sudah bisa digunakan.'
+      paket.isOffline
+          ? '5. Jika telah dikonfirmasi, Admin akan mengirimkan Kode Aktivasi via WhatsApp. Masukkan kode tersebut di halaman Aktivasi dan aplikasi Toko-mu sudah bisa digunakan tanpa internet.'
+          : '5. Jika telah dikonfirmasi, Admin akan memberikan waktu penggunaan aplikasi kepadamu dan aplikasi Toko-mu sudah bisa digunakan.'
     ];
-    String noRek = '1234567890';
-    String noWa = '6285892660932';
-    String messageWa =
-        'Hai%20Pengguna%20Baru,%20Yuk%20isi%20data%20dirimu%20dulu%0A%0ANama%20:%0AEmail%20:%0ANama%20Toko%20:%0AWilayah%20:%0A%0A*sertakan%20bukti%20pembayaranmu%20dibawah%20pesan%20ini%20ya%20;)';
-    String nmRek = 'PT Diatera Cipta Teknologi';
+    String noRek = Env.rekeningNo;
+    String noWa = Env.waAdmin;
+    String messageWa = Uri.encodeComponent(
+        'Hai Pengguna Baru, Yuk isi data dirimu dulu\n\nPaket : ${info.nama}\nNama : ${token.read('name') ?? ''}\nEmail : ${token.read('email') ?? ''}\nNama Toko : ${token.read('store') ?? ''}\nWilayah :\n\n*sertakan bukti pembayaranmu dibawah pesan ini ya ;)');
+    String nmRek = Env.rekeningNama;
     Size size = MediaQuery.of(context).size;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -41,8 +47,8 @@ class PaymentDetailPage extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
-          title: const Text('Pembayaran Subscribe',
-              style: TextStyle(
+          title: Text('Pembayaran ${info.nama}',
+              style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 18)),
@@ -71,8 +77,8 @@ class PaymentDetailPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Paket Subsribe 30 hari',
-                        style: TextStyle(
+                    Text(info.nama,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -82,20 +88,15 @@ class PaymentDetailPage extends StatelessWidget {
                       children: [
                         SvgPicture.asset('assets/svg/payment_card.svg',
                             width: 105),
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Input Stok Unlimited ✓',
-                                style: TextStyle(color: Colors.white)),
-                            Text('Tambah User/Karyawan Unlimited ✓',
-                                style: TextStyle(color: Colors.white)),
-                            Text('Connect to Printer Bluetooth ✓',
-                                style: TextStyle(color: Colors.white)),
-                            Text('Laporan Transaksi Payment ✓',
-                                style: TextStyle(color: Colors.white)),
-                            SizedBox(height: 5),
-                            Text('100K / bulan',
-                                style: TextStyle(
+                            ...info.fitur.take(4).map((fitur) => Text(
+                                '$fitur ✓',
+                                style: const TextStyle(color: Colors.white))),
+                            const SizedBox(height: 5),
+                            Text(info.harga,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -112,9 +113,9 @@ class PaymentDetailPage extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15)),
-                      child: const Text(
-                        'Lifetime : 30 hari',
-                        style: TextStyle(
+                      child: Text(
+                        info.masaAktif,
+                        style: const TextStyle(
                             color: AppColors.primaryColor,
                             fontWeight: FontWeight.w600),
                         textAlign: TextAlign.center,
@@ -135,7 +136,7 @@ class PaymentDetailPage extends StatelessWidget {
                   color: AppColors.bgGrey,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey.withValues(alpha: 0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: const Offset(0, 90),
@@ -221,16 +222,21 @@ class PaymentDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               TextButton(
-                                  onPressed: () => Clipboard.setData(
-                                              ClipboardData(text: noRek))
-                                          .then((_) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                backgroundColor:
-                                                    AppColors.primaryColor,
-                                                content: Text(
-                                                    "No.Rek copied to clipboard")));
-                                      }),
+                                  onPressed: () {
+                                    // diambil sebelum await, context bisa
+                                    // sudah tidak valid saat clipboard selesai
+                                    final messenger =
+                                        ScaffoldMessenger.of(context);
+                                    Clipboard.setData(
+                                            ClipboardData(text: noRek))
+                                        .then((_) {
+                                      messenger.showSnackBar(const SnackBar(
+                                          backgroundColor:
+                                              AppColors.primaryColor,
+                                          content: Text(
+                                              "No.Rek copied to clipboard")));
+                                    });
+                                  },
                                   child: const Text(
                                     'Salin',
                                     style: TextStyle(

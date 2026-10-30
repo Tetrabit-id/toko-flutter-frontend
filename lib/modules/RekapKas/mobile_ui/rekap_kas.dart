@@ -51,7 +51,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
     final querySize = MediaQuery.of(context);
     TextEditingController searchC = TextEditingController();
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: headerPelangganPage(querySize.size, searchC),
@@ -91,14 +91,14 @@ class _RekapKasPageState extends State<RekapKasPage> {
               }),
         ),
         floatingActionButton: IconButton(
-            iconSize: 50,
+            iconSize: 56,
             onPressed: () => Get.toNamed(RouteName.addRekapKas),
             icon: Container(
-                width: 100,
-                height: 100,
+                width: 56,
+                height: 56,
                 decoration: const BoxDecoration(
                     color: Color.fromRGBO(46, 44, 44, 1),
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
+                    borderRadius: BorderRadius.all(Radius.circular(28))),
 
                 // ignore: prefer_const_constructors
                 child: Icon(

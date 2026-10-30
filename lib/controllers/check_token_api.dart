@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import '../models/user.dart';
-import 'package:diatera_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;

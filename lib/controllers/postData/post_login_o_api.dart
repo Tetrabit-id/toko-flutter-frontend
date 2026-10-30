@@ -1,13 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:diatera_pos/models/user_owner.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/models/user_owner.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 
 class DataLoginOwnerAPI extends GetxController {
   // Tombol Fungsi Login
@@ -68,6 +68,7 @@ class DataLoginOwnerAPI extends GetxController {
               'name': value.additionalUserInfo!.profile!['name'],
               'store': '',
               'password': '',
+              'plan': postApiRegisterO.plan,
               'googleTokenUserId': tokenGoogle,
             }),
           );

@@ -6,6 +6,7 @@ class User {
   String? store;
   String? role;
   String? parent;
+  String? plan;
   bool? owner;
   bool? statusPembayaran;
   String? token;
@@ -18,6 +19,7 @@ class User {
     this.store,
     this.role,
     this.parent,
+    this.plan,
     this.owner,
     this.statusPembayaran,
     this.token,
@@ -32,6 +34,7 @@ class User {
       store: json['store'],
       role: json['role'],
       parent: json['parent'],
+      plan: json['plan'] ?? 'subscription',
       owner: json['owner'],
       statusPembayaran: json['status_pembayaran'],
       token: json['token'],

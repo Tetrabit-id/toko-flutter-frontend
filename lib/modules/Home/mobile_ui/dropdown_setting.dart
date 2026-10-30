@@ -1,4 +1,4 @@
-import 'package:diatera_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +13,7 @@ class DropdownSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Padding(
         padding: const EdgeInsets.only(right: 10, left: 5, top: 4, bottom: 4),
         child: PopupMenuButton(
@@ -21,8 +21,8 @@ class DropdownSetting extends StatelessWidget {
             icon: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  width: 100,
-                  height: 100,
+                  width: 40,
+                  height: 40,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                   decoration: const BoxDecoration(
@@ -52,6 +52,7 @@ class DropdownSetting extends StatelessWidget {
                           Text('Akun', style: TextStyle(color: Colors.black87))
                         ],
                       )),
+                  if (paket.canChat)
                   PopupMenuItem(
                       onTap: () async {
                         await getApiUsersK.getApi();
@@ -92,6 +93,18 @@ class DropdownSetting extends StatelessWidget {
                               style: TextStyle(color: Colors.black87))
                         ],
                       )),
+                  // Paket offline: data hanya di HP, perlu backup
+                  if (paket.isOffline)
+                    PopupMenuItem(
+                        onTap: () => Get.toNamed(RouteName.backup),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.backup, color: Colors.black),
+                            SizedBox(width: 5),
+                            Text('Backup & Restore',
+                                style: TextStyle(color: Colors.black87))
+                          ],
+                        )),
                   PopupMenuItem(
                       onTap: () => printer.getDevices(),
                       child: const Row(

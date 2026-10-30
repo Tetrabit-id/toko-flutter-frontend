@@ -13,6 +13,18 @@ class GetTransaksiAPI extends GetxController {
 
   // Function Get Semua Data Transaksi
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal
+    if (paket.isOffline) {
+      dataLaporan.assignAll(await localTransaksi.getTransaksi());
+      return dataLaporan;
+    }
+
+    // Subscription tanpa koneksi: cache terakhir + transaksi yang belum terkirim
+    if (koneksi.terputus) {
+      dataLaporan.assignAll(await localTransaksi.getTransaksi());
+      return dataLaporan;
+    }
+
     try {
       var idOwner = token.read('role') != 'admin'
           ? token.read('parentId')
@@ -42,9 +54,13 @@ class GetTransaksiAPI extends GetxController {
 
       var laporanData = (data as Map<String, dynamic>)['data'];
       dataLaporan.addAll(laporanData);
+      await localTransaksi.cacheTransaksi(laporanData);
+      // Transaksi offline yang belum terkirim tetap terhitung di laporan
+      dataLaporan.addAll(await localTransaksi.getPending());
       return dataLaporan;
     } catch (e) {
       print(e);
+      dataLaporan.assignAll(await localTransaksi.getTransaksi());
     }
     return dataLaporan;
   }

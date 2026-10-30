@@ -1,7 +1,6 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,9 +31,9 @@ class _HomePageMobileState extends State<HomePageMobile> {
     List dataChart = getDataSummary.dataSummaryChart;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.bgGrey,
           appBar: AppBar(
             leading: Container(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -43,6 +42,7 @@ class _HomePageMobileState extends State<HomePageMobile> {
             leadingWidth: querySize.size.width / 5,
             elevation: 0.5,
             backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
             actions: [
               profile(),
               const DropdownSetting(),
@@ -58,94 +58,163 @@ class _HomePageMobileState extends State<HomePageMobile> {
               },
               child: ListView(
                 children: [
-                  Padding(
-                      padding: EdgeInsets.only(top: querySize.size.height / 35),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          detailPemasukan(),
-                          ElevatedButton(
-                              onPressed: () => Get.toNamed(RouteName.detail),
-                              style: ElevatedButton.styleFrom(
-                                  fixedSize: const Size(130, 0),
-                                  backgroundColor: AppColors.primaryColor,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    bottomLeft: Radius.circular(8),
-                                  ))),
-                              child: const Text('Lihat Detail',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Lato',
-                                  )))
-                        ],
-                      )),
+                  kartuPemasukan(),
                   SalesSummary(size: querySize.size, dataChart: dataChart),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Stok Habis',
-                              style: TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              )),
-                          ElevatedButton(
-                              onPressed: () => Get.toNamed(RouteName.addStok),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor:
-                                    const Color.fromRGBO(46, 44, 44, 1),
-                                shadowColor: Colors.transparent,
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 8, 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.add),
-                                  Text('Tambah'),
-                                ],
-                              ))
-                        ],
-                      )),
-                  CardStokHabis(size: querySize.size),
-                  const SizedBox(height: 10),
+                              child: const Icon(Icons.inventory_2_outlined,
+                                  color: Colors.redAccent, size: 20),
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Text('Stok Habis',
+                                  style: TextStyle(
+                                    fontFamily: 'Lato',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  )),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => Get.toNamed(RouteName.addStok),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.primaryColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.add, size: 18),
+                              label: const Text('Tambah',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w600)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        CardStokHabis(size: querySize.size),
+                      ],
+                    ),
+                  ),
                 ],
               ))),
     );
   }
 
-  Padding detailPemasukan() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15),
+  Widget kartuPemasukan() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 64, 190, 20),
+            Color.fromARGB(255, 5, 120, 29),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Total Pemasukanmu',
-              style: TextStyle(
-                fontFamily: 'Lato',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              )),
-          FutureBuilder(
-              future: transaksi.getTotalPemasukkan(),
-              initialData: transaksi.totalPemasukkan,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LoadingCilcular();
-                }
-                return Text(
-                    current.format(transaksi.totalPemasukkan).substring(4),
-                    style: const TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                    ));
-              })
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.account_balance_wallet_rounded,
+                    color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 10),
+              const Text('Total Pemasukanmu',
+                  style: TextStyle(
+                    fontFamily: 'Lato',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white70,
+                  )),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 48,
+            child: FutureBuilder(
+                future: transaksi.getTotalPemasukkan(),
+                initialData: transaksi.totalPemasukkan,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Align(
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
+                      ),
+                    );
+                  }
+                  return FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                        'Rp ${current.format(transaksi.totalPemasukkan).substring(4)}',
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        )),
+                  );
+                }),
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: Colors.white24),
+          InkWell(
+            onTap: () => Get.toNamed(RouteName.detail),
+            borderRadius: BorderRadius.circular(8),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                children: [
+                  Text('Lihat Detail',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontFamily: 'Lato',
+                        fontWeight: FontWeight.w600,
+                      )),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_rounded,
+                      color: Colors.white, size: 20),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 
 class TransaksiController extends GetxController {
@@ -63,6 +63,36 @@ class TransaksiController extends GetxController {
       pendapatanNow = pendapatanNow + jmlTransaksi;
     }
     return pendapatanBulanan = pendapatanNow;
+  }
+
+  // Pendapatan per pelanggan (member) pada bulan yyyy-MM, terbesar dulu.
+  // Bentuk item: {name, memberId, jumlah, total}
+  Future<List<Map<String, dynamic>>> getPendapatanPerPelanggan(
+      String bulan) async {
+    await getApiTransaksi.getApi();
+    await getApiPelanggan.getApi();
+    var member = {for (var p in getApiPelanggan.dataPelanggan) p['_id']: p};
+
+    var hasil = <String, Map<String, dynamic>>{};
+    for (var t in getApiTransaksi.dataLaporan) {
+      var id = t['membershipsId'];
+      if (id == null || id == '' || !'${t['date']}'.startsWith(bulan)) {
+        continue;
+      }
+      var item = hasil.putIfAbsent(
+          id,
+          () => {
+                'name': member[id]?['name'] ?? 'Pelanggan terhapus',
+                'memberId': member[id]?['memberId'] ?? '',
+                'jumlah': 0,
+                'total': 0,
+              });
+      item['jumlah'] += 1;
+      item['total'] += t['jumlahTransaksi'] ?? 0;
+    }
+
+    return hasil.values.toList()
+      ..sort((a, b) => (b['total'] as num).compareTo(a['total'] as num));
   }
 
   Future<num> getTotalPemasukkan() async {

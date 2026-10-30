@@ -45,6 +45,7 @@ import '../controllers/edit_stok_controller.dart';
 import '../controllers/postData/post_register_o_api.dart';
 import '../controllers/snackbar.dart';
 import '../controllers/summary_chart_controller.dart';
+import '../controllers/getData/get_report_produk.dart';
 import '../controllers/invoice_payment_controllers.dart';
 import '../controllers/kasir_controllers.dart';
 import '../controllers/auth_controllers.dart';
@@ -53,11 +54,37 @@ import '../controllers/updateData/put_update_kas_by_id.dart';
 import '../controllers/updateData/put_update_point_pelanggan_by_id.dart';
 import '../controllers/updateData/put_update_produk_by_id.dart';
 import '../controllers/karyawan_controllers.dart';
+import '../services/device_id_service.dart';
+import '../services/license_service.dart';
+import '../services/plan_service.dart';
+import '../services/local_db.dart';
+import '../repositories/local_stok_repository.dart';
+import '../repositories/local_transaksi_repository.dart';
+import '../repositories/local_pelanggan_repository.dart';
+import '../repositories/local_rekap_kas_repository.dart';
+import '../repositories/local_sync_repository.dart';
+import '../repositories/local_backup_repository.dart';
+import '../services/connectivity_service.dart';
+import '../services/sync_service.dart';
+import '../services/midtrans_service.dart';
 
 class AppBinding implements Bindings {
   @override
   void dependencies() {
     Get.put(AuthController(), permanent: true);
+    Get.put(DeviceIdService(), permanent: true);
+    Get.put(LicenseService(), permanent: true);
+    Get.put(PlanService(), permanent: true);
+    Get.put(LocalDb(), permanent: true);
+    Get.put(LocalStokRepository(), permanent: true);
+    Get.put(LocalTransaksiRepository(), permanent: true);
+    Get.put(LocalPelangganRepository(), permanent: true);
+    Get.put(LocalRekapKasRepository(), permanent: true);
+    Get.put(LocalSyncRepository(), permanent: true);
+    Get.put(LocalBackupRepository(), permanent: true);
+    Get.put(SyncService(), permanent: true);
+    Get.put(ConnectivityService(), permanent: true);
+    Get.put(MidtransService(), permanent: true);
     Get.put(DeleteStokAPI());
     Get.put(DeleteKaryawanAPI());
     Get.put(DeletePelangganAPI());
@@ -100,6 +127,7 @@ class AppBinding implements Bindings {
     Get.put(Snackbar());
     Get.put(TransaksiController());
     Get.put(GetDataSummary());
+    Get.put(GetReportProduk());
     Get.put(PrinterController());
     Get.put(ObrolanController());
     Get.put(AddKasbon());

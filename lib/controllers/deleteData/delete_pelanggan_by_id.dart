@@ -2,7 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,14 @@ class DeletePelangganAPI extends GetxController {
   Future<void> connectAPI(
     String? idPelanggan,
   ) async {
+    // Paket offline, atau pelanggan subscription yang belum terkirim: lokal
+    if (paket.isOffline || await localPelanggan.isPending(idPelanggan)) {
+      await localPelanggan.deletePelanggan(idPelanggan);
+      sinkron.refreshCount();
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.delete(
           Uri.parse('$baseUrl/memberships/$idPelanggan'),

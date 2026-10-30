@@ -1,4 +1,4 @@
-# diatera_pos
+# tetrabit_toko_pos
 
 A new Flutter project.
 

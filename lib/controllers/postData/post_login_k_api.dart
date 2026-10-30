@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:diatera_pos/models/user.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/models/user.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 
 class DataLoginKaryawanAPI extends GetxController {
   // Tombol Fungsi Login

@@ -19,7 +19,7 @@ class _PaymentInfoForOwnerState extends State<PaymentInfoForOwner> {
     Size size = MediaQuery.of(context).size;
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
           backgroundColor: Colors.white,
           body: Center(

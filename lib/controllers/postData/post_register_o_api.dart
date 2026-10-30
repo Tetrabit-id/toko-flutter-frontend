@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 
 class DataRegisterOwnerAPI extends GetxController {
   // TextEditorControl for Register
@@ -15,6 +15,9 @@ class DataRegisterOwnerAPI extends GetxController {
   TextEditingController storeNewC = TextEditingController();
   TextEditingController passwordNewC = TextEditingController();
   TextEditingController repasswordNewC = TextEditingController();
+
+  // Paket yang dipilih di halaman pilih paket: subscription | offline
+  String plan = 'subscription';
 
   // FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -55,6 +58,7 @@ class DataRegisterOwnerAPI extends GetxController {
           'name': name,
           'password': passwordBase64,
           'store': store,
+          'plan': plan,
         }),
       );
 

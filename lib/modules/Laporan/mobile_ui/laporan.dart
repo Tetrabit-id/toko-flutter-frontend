@@ -1,4 +1,4 @@
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:flutter/material.dart';
 
 import '../../../style/styles.dart';
@@ -27,7 +27,7 @@ class _LaporanPageState extends State<LaporanPage>
   Widget build(BuildContext context) {
     final querySize = MediaQuery.of(context);
     return MediaQuery(
-        data: querySize.copyWith(textScaleFactor: 0.81),
+        data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,

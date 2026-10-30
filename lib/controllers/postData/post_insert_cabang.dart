@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:diatera_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:http/http.dart' as http;
 
 import '../../routes/state_global.dart';
@@ -19,6 +19,8 @@ class InsertCabangAPI extends GetxController {
     String? alamat,
     String noTelp,
   ) async {
+    if (koneksi.butuhInternet()) return;
+
     try {
       var response = await http.post(Uri.parse('$baseUrl/cabang'),
           body: json.encode({

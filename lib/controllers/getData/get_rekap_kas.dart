@@ -12,6 +12,13 @@ class GetRekapKasAPI extends GetxController {
 
   // Function Get Data Pelanggan
   Future<List> getApi() async {
+    // Paket offline: dari DB lokal
+    // Subscription tanpa koneksi: cache terakhir + rekap kas yang belum terkirim
+    if (paket.isOffline || koneksi.terputus) {
+      dataKas.assignAll(await localRekapKas.getRekapKas());
+      return dataKas;
+    }
+
     try {
       var response = await http.get(
         Uri.parse(
@@ -39,9 +46,13 @@ class GetRekapKasAPI extends GetxController {
 
       var rekapKasData = (data as Map<String, dynamic>)['data'];
       dataKas.addAll(rekapKasData);
+      await localRekapKas.cacheRekapKas(rekapKasData);
+      // termasuk rekap kas yang dibuat offline dan belum terkirim
+      dataKas.addAll(await localRekapKas.getPending());
       return dataKas;
     } catch (e) {
       print(e);
+      dataKas.assignAll(await localRekapKas.getRekapKas());
     }
     return dataKas;
   }

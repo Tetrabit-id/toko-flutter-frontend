@@ -39,12 +39,13 @@ class SalesSummary extends StatelessWidget {
             {'id': 5, 'data': 0.0, 'day': '', 'tgl': ''},
             {'id': 6, 'data': 0.0, 'day': '', 'tgl': ''}
           ];
+          List data = snapshot.data ?? [];
           getDataSummary.dataSummaryChart.clear();
-          if (snapshot.data!.isNotEmpty &&
+          if (data.isNotEmpty &&
               getDataSummary.dataSummaryChart != salesSummary) {
             getDataSummary.dataSummaryChart.addAll(salesSummary);
 
-            for (var element in snapshot.data!.toList()) {
+            for (var element in data.toList()) {
               for (int i = 0; i < element.length; i++) {
                 getDataSummary.dataSummary.add({
                   'day': DateFormat('EEEE')

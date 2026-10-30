@@ -39,32 +39,34 @@ class AppSvg {
       SvgPicture.asset('assets/svg/available_stok.svg');
 }
 
+const _primary = ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn);
+
 class NavSvg {
   static var homeSvg = SvgPicture.asset('assets/svg/home_nav.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var stokSvg = SvgPicture.asset('assets/svg/stok_nav.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var kasirSvg = SvgPicture.asset('assets/svg/kasir_nav.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var userSvg = SvgPicture.asset('assets/svg/user_nav.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var laporanSvg = SvgPicture.asset('assets/svg/laporan_nav.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var homeSelectedSvg = SvgPicture.asset(
       'assets/svg/home_nav_selected.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var stokSelectedSvg = SvgPicture.asset(
       'assets/svg/stok_nav_selected.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var kasirSelectedSvg = SvgPicture.asset(
       'assets/svg/kasir_nav_selected.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var userSelectedSvg = SvgPicture.asset(
       'assets/svg/user_nav_selected.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
   static var laporanSelectedSvg = SvgPicture.asset(
       'assets/svg/laporan_nav_selected.svg',
-      color: AppColors.primaryColor);
+      colorFilter: _primary);
 }
 
 final current =

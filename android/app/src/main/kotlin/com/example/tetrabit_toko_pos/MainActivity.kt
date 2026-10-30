@@ -1,4 +1,4 @@
-package com.example.diatera_pos
+package com.example.tetrabit_toko_pos
 
 import io.flutter.embedding.android.FlutterActivity
 

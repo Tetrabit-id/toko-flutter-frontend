@@ -1,6 +1,6 @@
-import 'package:diatera_pos/components/loading_cilcular.dart';
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/components/loading_cilcular.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -23,7 +23,7 @@ class _WelcomePageMobileState extends State<WelcomePageMobile> {
     return box.hasData('token')
         ? Container(color: Colors.white, child: const LoadingCilcular())
         : MediaQuery(
-            data: querySize.copyWith(textScaleFactor: 0.81),
+            data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
             child: Scaffold(
               backgroundColor: Colors.white,
               body: SizedBox(
@@ -59,7 +59,7 @@ class _WelcomePageMobileState extends State<WelcomePageMobile> {
                               const Color.fromRGBO(49, 49, 49, 1),
                               AppColors.primaryColor,
                               Size(size.width - 100, size.height / 20),
-                              () => Get.toNamed(RouteName.signUpMobile)),
+                              () => Get.toNamed(RouteName.choosePlan)),
                         ],
                       ),
                     ),

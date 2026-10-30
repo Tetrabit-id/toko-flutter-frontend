@@ -1,10 +1,11 @@
-import 'package:diatera_pos/components/send_stok_popup.dart';
-import 'package:diatera_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/components/send_stok_popup.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../routes/state_global.dart';
 import '../style/styles.dart';
 import 'edit_stok_popup.dart';
+import 'produk_image.dart';
 
 class StokCard extends StatelessWidget {
   const StokCard({Key? key, this.index = 0, required this.dataStok})
@@ -35,9 +36,7 @@ class StokCard extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(8)),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: image != null
-                    ? Image.network('$baseUrl/files/$image').image
-                    : Image.asset('assets/img/bulog_toko_t.png').image),
+                image: produkImage(image, prefix: '$baseUrl/files/')),
           ),
         ),
         const SizedBox(width: 10),
@@ -191,9 +190,7 @@ class FilterStokCard extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(8)),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: image != null
-                    ? Image.network('$image').image
-                    : Image.asset('assets/img/bulog_toko_t.png').image),
+                image: produkImage(image)),
           ),
         ),
         const SizedBox(width: 10),
@@ -254,6 +251,7 @@ class FilterStokCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     itemBuilder: (context) => [
+                      if (paket.canKirimStok)
                       PopupMenuItem(
                           onTap: () => token.read('role') != 'admin'
                               ? null

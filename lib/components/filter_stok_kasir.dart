@@ -1,7 +1,7 @@
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
 import '../routes/state_global.dart';
 
 class FilterStokKasirPage extends StatefulWidget {
@@ -82,7 +82,7 @@ class _FilterStokKasirPageState extends State<FilterStokKasirPage> {
                   }
 
                   return MediaQuery(
-                    data: querySize.copyWith(textScaleFactor: 0.81),
+                    data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
                     child: ListTile(
                       title: Text(option.toString()),
                       trailing: Text(

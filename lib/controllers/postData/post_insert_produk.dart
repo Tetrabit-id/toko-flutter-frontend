@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 class InsertProdukAPI extends GetxController {
   // fungsi insert katagori produk
@@ -23,6 +23,28 @@ class InsertProdukAPI extends GetxController {
     String? file,
     int hargaBeli,
   ) async {
+    // Paket offline: produk + stok disimpan lokal, foto disalin ke folder app
+    if (paket.isOffline) {
+      var error = await localStok.insertProduk(
+        produkKategoriId: produkKategoriId,
+        produkMerkId: produkMerkId,
+        code: kodeBarang ?? '',
+        name: namaBarang ?? '',
+        qty: qty,
+        satuan: satuan,
+        harga: hargaBarang,
+        hargaModal: hargaBeli,
+        file: file,
+      );
+      if (error != null) {
+        snackbarNotif.unsuccess('Unsuccess', error);
+        return;
+      }
+      snackbarNotif.success('Success', 'Produk telah ditambahkan');
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -34,11 +56,11 @@ class InsertProdukAPI extends GetxController {
         'Content-Type': 'multipart/form-data'
       });
 
-      var dataImg = http.MultipartFile(
+      // XFile bisa membaca path file (HP) maupun blob URL (web)
+      var dataImg = http.MultipartFile.fromBytes(
         'file',
-        File(file!).readAsBytes().asStream(),
-        File(file).lengthSync(),
-        filename: file.split('/').last,
+        await XFile(file!).readAsBytes(),
+        filename: picker.image?.name ?? file.split('/').last,
       );
 
       var produk = json.encode({

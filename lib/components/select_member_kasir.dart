@@ -1,4 +1,4 @@
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import '../routes/state_global.dart';
 
@@ -81,7 +81,7 @@ class _SelectMemberKasirPageState extends State<SelectMemberKasirPage> {
                   var name = memberName[index];
 
                   return MediaQuery(
-                    data: querySize.copyWith(textScaleFactor: 0.81),
+                    data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
                     child: ListTile(
                       title: Text(name),
                       trailing: Text(

@@ -1,7 +1,7 @@
-import 'package:diatera_pos/modules/Stok/mobile_ui/body_stok.dart';
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/route.dart';
-import 'package:diatera_pos/style/styles.dart';
+import 'package:tetrabit_toko_pos/modules/Stok/mobile_ui/body_stok.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/route.dart';
+import 'package:tetrabit_toko_pos/style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -42,7 +42,7 @@ class _StokPageState extends State<StokPage>
     final querySize = MediaQuery.of(context);
 
     return MediaQuery(
-      data: querySize.copyWith(textScaleFactor: 0.81),
+      data: querySize.copyWith(textScaler: const TextScaler.linear(0.81)),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: headerStokPage(querySize.size, token.read('role')),
@@ -65,7 +65,7 @@ class _StokPageState extends State<StokPage>
         floatingActionButton: token.read('role') == 'Kasir'
             ? const SizedBox()
             : IconButton(
-                iconSize: 50,
+                iconSize: 56,
                 onPressed: () async {
                   await getApiKategoriProduk.getApi();
                   await getApiMerkProduk.getApi();
@@ -77,7 +77,7 @@ class _StokPageState extends State<StokPage>
                   setState(() {});
                   String idcabang = '';
                   if (getApiCabang.dataCabangOwner.length < 2) {
-                    idcabang = token.read('cabangId');
+                    idcabang = token.read('cabangId') ?? localDb.cabangId;
                   } else {
                     String? id = getApiCabang.dataCabangOwner[tabC.index].id;
                     if (id != null) {
@@ -92,11 +92,11 @@ class _StokPageState extends State<StokPage>
                   }
                 },
                 icon: Container(
-                    width: 100,
-                    height: 100,
+                    width: 56,
+                    height: 56,
                     decoration: const BoxDecoration(
                         color: AppColors.secondaryColor,
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                        borderRadius: BorderRadius.all(Radius.circular(28))),
 
                     // ignore: prefer_const_constructors
                     child: Icon(
@@ -128,20 +128,23 @@ class _StokPageState extends State<StokPage>
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                      flex: 15,
-                      child: GestureDetector(
-                        onTap: () => token.read('role') != 'admin'
-                            ? null
-                            : Get.toNamed(RouteName.addCabang),
-                        child: SizedBox(
-                            height: 35,
-                            child: Icon(Icons.add_business_rounded,
-                                color: token.read('role') != 'admin'
-                                    ? Colors.grey
-                                    : Colors.black)),
-                      )),
-                  Container(width: 1, height: 35, color: Colors.grey),
+                  // Paket offline hanya punya cabang Pusat
+                  if (paket.canMultiCabang) ...[
+                    Expanded(
+                        flex: 15,
+                        child: GestureDetector(
+                          onTap: () => token.read('role') != 'admin'
+                              ? null
+                              : Get.toNamed(RouteName.addCabang),
+                          child: SizedBox(
+                              height: 35,
+                              child: Icon(Icons.add_business_rounded,
+                                  color: token.read('role') != 'admin'
+                                      ? Colors.grey
+                                      : Colors.black)),
+                        )),
+                    Container(width: 1, height: 35, color: Colors.grey),
+                  ],
                   Expanded(
                       flex: 80,
                       child: getApiCabang.dataCabangOwner.length < 2 ||

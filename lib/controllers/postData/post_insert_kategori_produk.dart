@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
-import 'package:diatera_pos/routes/base_url.dart';
-import 'package:diatera_pos/routes/state_global.dart';
+import 'package:tetrabit_toko_pos/routes/base_url.dart';
+import 'package:tetrabit_toko_pos/routes/state_global.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +14,18 @@ class InsertKategoriProdukAPI extends GetxController {
     String? code,
     String? name,
   ) async {
+    // Paket offline: disimpan lokal
+    if (paket.isOffline) {
+      await localStok.insertKategori(code, name);
+      await getApiKategoriProduk.getApi();
+      if (getApiKategoriProduk.dataKategoriProduk.length > 1) {
+        Get.back();
+        snackbarNotif.success('Success', 'Kategori produk telah ditambahkan');
+      }
+      return;
+    }
+    if (koneksi.butuhInternet()) return;
+
     try {
       var request = http.MultipartRequest(
         'POST',
